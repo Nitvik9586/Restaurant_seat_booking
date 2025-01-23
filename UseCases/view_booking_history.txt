@@ -1,0 +1,3 @@
+** View Booking History 1.0
+    1. From the booking history selects the booking to view.
+    2. Can see the booking details.

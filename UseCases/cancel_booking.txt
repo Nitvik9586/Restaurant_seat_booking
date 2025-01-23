@@ -1,0 +1,6 @@
+** Cancel bookings 1.0
+    1. Clicks on cancel button.
+    2. Confirms the cancel request.
+    3. After confirmation the cancel charges will be deducted.
+    4. Rest of the money will be refunded to the customer.
+    4. Booked seat's will be updated.

@@ -1,0 +1,6 @@
+** Reschedule Bookings 1.0
+    1. Choose the date.
+    2. Choose the number of person.
+    3. Choose the time slot.
+    4. Click on confirmation button Reschedule done.
+    5. Previous booking will be canceled automatically.

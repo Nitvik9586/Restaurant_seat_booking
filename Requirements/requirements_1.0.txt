@@ -1,0 +1,8 @@
+** Restaurant seat booking **
+
+Requirements 1.0
+
+1. Customer can book seat.
+2. Customer can view their booked seat.
+3. Customer can reschedule his bookings.
+4. Customer can cancel his bookings.
