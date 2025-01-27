@@ -1,10 +1,8 @@
 ** Seat booking 1.0
     1. They choose the date.
     2. Selects the number of person.
-    2. Choose the time slot.
-    4. Confirms the booking.
-    5. Proceed to pay the booking fees.
-        // payment fails
-        5.1 Can do repayment.
-    6. After payment confirmation booking is done.
-    7. available seat's will be updated. 
+    3. Choose the time slot.
+    4. Check if seat available.
+    5. if available proceed to pay the booking fees.
+    6. After payment confirmation available seat's will be updated. 
+    7. Booking is added to booking history.
