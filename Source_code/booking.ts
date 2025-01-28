@@ -65,6 +65,6 @@ export class Booking {
   }
 }
 
-const b1 = new Booking("b1","2025-01-29",5,"1 P.M.");
+const b1 = new Booking("b1","2025-01-29",5,"1 P.M.",BookingStatus.CONFIRMED);
 b1.confirmBooking();
 b1.cancelBooking("b1");

@@ -41,13 +41,17 @@ export class bookingHistory {
       amount,
       paymentStatus,
     });
+    // console.log(this.bookingHistoryarr);
+    
   }
 
   public getHistory(bookingId: string): bookingDetail | undefined {
+        const customerArr: any = [];
     for (let i = 0; i < this.bookingHistoryarr.length; i++) {
       if (this.bookingHistoryarr[i].bookingId == bookingId) {
-        return this.bookingHistoryarr[i];
+        customerArr.push(this.bookingHistoryarr[i]);
       }
     }
+    return customerArr;
   }
 }
