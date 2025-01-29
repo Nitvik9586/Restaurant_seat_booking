@@ -105,14 +105,14 @@ class Simulator {
       return;
     }
 
-    const updatedBooking: BookingDetails = {
-      bookingId: oldBooking.bookingId,
-      bookingDate: bookingDate,
-      numOfPerson: numOfPerson,
-      timeSlot: timeSlot,
-      status: oldBooking.status,
-      payment: oldBooking.payment
-    }
+    // const updatedBooking: BookingDetails = {
+    //   bookingId: oldBooking.bookingId,
+    //   bookingDate: bookingDate,
+    //   numOfPerson: numOfPerson,
+    //   timeSlot: timeSlot,
+    //   status: oldBooking.status,
+    //   payment: oldBooking.payment
+    // }
 
     if (oldBooking.numOfPerson < numOfPerson) {
       const newNumOfPerson = numOfPerson - oldBooking.numOfPerson
@@ -120,8 +120,7 @@ class Simulator {
 
       const payment = new Payment(payableAmount)
       payment.process();
-
-      updatedBooking.payment.amount += payableAmount;
+      oldBooking.payment.amount += payableAmount;
       this.restaurant.removeSeat(bookingDate, timeSlot, newNumOfPerson);
     } else if (oldBooking.numOfPerson > numOfPerson) {
       const newNumOfPerson = oldBooking.numOfPerson - numOfPerson;
@@ -131,8 +130,10 @@ class Simulator {
       payment.refund();
 
       this.restaurant.addSeat(bookingDate, timeSlot, newNumOfPerson);
-      updatedBooking.payment.amount -= payableAmount;
+      oldBooking.payment.amount -= payableAmount;
     }
+    oldBooking.numOfPerson = numOfPerson;
+
 
     // const updatedBookingI = new Booking(
     //   oldBooking.bookingId,
@@ -143,16 +144,28 @@ class Simulator {
     //   oldBooking.status
     // )
 
+    const bookingUpdate = new Booking(
+      oldBooking.bookingId,
+      oldBooking.bookingDate,
+      oldBooking.numOfPerson,
+      oldBooking.timeSlot,
+      oldBooking.payment
+    );
+
+    // console.log(bookingUpdate);
+    
+    const updatedBooking = bookingUpdate.rescheduleBooking()
     this.bookingHistory.updateHistory(updatedBooking)
-    this.bookingHistory.getFullBookingHistory();
+    // this.bookingHistory.getFullBookingHistory();
   }
 }
 
 const s1 = new Simulator();
 s1.setRestaurant(30);
 s1.simulateBooking("b1", "2025-01-30", 5, "1 P.M.")
+s1.simulateBooking("b2", "2025-01-30", 7, "2 P.M.")
 // s1.simulateCancelBooking("b1");
 s1.simulateReschedule("b1", "2025-01-30", 7, "1 P.M.")
-s1.simulateReschedule("b1", "2025-01-30", 19, "1 P.M.")
+s1.simulateReschedule("b1", "2025-01-30", 11, "1 P.M.") 
 
-// s1.simulateCancelBooking("b2");
+// s1.simulateCancelBooking("b2"); 
