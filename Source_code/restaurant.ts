@@ -8,7 +8,7 @@ type Seat = {
 
 export class Restaurant {
   constructor(
-    private totalSeat: number,
+    private totalSeat: number = 0,
     private seatAvaibility: SeatAvaibility = {}
   ) {}
 
@@ -30,9 +30,10 @@ export class Restaurant {
     const dates: string[] = [];
 
     for (let i = 0; i < 7; i++) {
+      
       const date: string = new Date(start.setDate(start.getDate() + 1))
-        .toISOString()
-        .split("T")[0];
+      .toISOString()
+      .split("T")[0];
       dates.push(date);
     }
 
@@ -62,11 +63,11 @@ export class Restaurant {
 
   public addSeat(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatAvaibility[date][timeSlot] += numOfSeat;
-    console.log("Seats updated.");
+    // console.log("Seats updated.");
   }
 
   public removeSeat(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatAvaibility[date][timeSlot] -= numOfSeat;
-    console.log("Seats updated.");
+    // console.log("Seats updated.");
   }
 }

@@ -1,79 +1,43 @@
-type bookingDetail = {
+import { PaymentDetail } from "./payment";
+import { BookingStatus } from "./booking";
+
+export type BookingDetails = {
   bookingId: string;
   bookingDate: string;
   numOfPerson: number;
   timeSlot: string;
   status: BookingStatus;
-  amount: number;
-  paymentStatus: paymentStatus;
+  payment: PaymentDetail
 };
 
-enum BookingStatus {
-  PENDING = "PENDING",
-  CONFIRMED = "CONFIRMED",
-  CANCELED = "CANCELLED",
-}
+export class BookingHistory {
+  constructor(private bookingHistory: BookingDetails[] = []) { }
 
-enum paymentStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  REFUNDED = "REFUNDED",
-}
-
-export class bookingHistory {
-  constructor(private bookingHistoryarr: bookingDetail[] = []) {}
-
-  public addBookingHistory(
-    bookingId: string,
-    bookingDate: string,
-    numOfPerson: number,
-    timeSlot: string,
-    status: BookingStatus,
-    amount: number,
-    paymentStatus: paymentStatus
-  ): void {
-    this.bookingHistoryarr.push({
-      bookingId,
-      bookingDate,
-      numOfPerson,
-      timeSlot,
-      status,
-      amount,
-      paymentStatus,
-    });
-    // console.log(this.bookingHistoryarr);
-    
+  public addBookingHistory(bookingHistory: BookingDetails): void {
+    this.bookingHistory.push(bookingHistory);
   }
 
-  public getHistory(bookingId: string): bookingDetail | undefined {
-        const customerArr: any = [];
-    for (let i = 0; i < this.bookingHistoryarr.length; i++) {
-      if (this.bookingHistoryarr[i].bookingId == bookingId) {
-        customerArr.push(this.bookingHistoryarr[i]);
+  getFullBookingHistory(){
+    console.log(this.bookingHistory);
+  }
+
+  public getBookingHistroy(bookingId: string): BookingDetails | undefined {
+    const booking = this.bookingHistory.find(booking => booking.bookingId == bookingId)
+    
+    if (booking == undefined) {
+      console.log('Booking not found.')
+    } else {
+      // console.log('Booking found.')
+      return booking;
+    }
+  }
+
+  public updateHistory(booking: BookingDetails) { 
+    for (let i = 0; i < this.bookingHistory.length; i++) {
+      if (this.bookingHistory[i].bookingId == booking.bookingId) {
+        this.bookingHistory[i] = booking;
       }
     }
-
-    return customerArr;
-  }
-
-  public updateHistory( bookingId: string,
-    bookingDate: string,
-    numOfPerson: number,
-    timeSlot: string,){
-        let updateArr: any =[];
-
-    for (let i = 0; i < this.bookingHistoryarr.length; i++) {
-        if (this.bookingHistoryarr[i].bookingId == bookingId) {
-          updateArr = this.bookingHistoryarr[i];
-        }
-      }
-      console.log("update");
-      
-      updateArr.bookingDate = bookingDate;
-      updateArr.numOfPerson = numOfPerson;
-      updateArr.timeSlot = timeSlot;
-      console.log(this.bookingHistoryarr);
-      return updateArr;
-      
+    // console.log("Booking is updated.");
   }
 }
