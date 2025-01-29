@@ -23,14 +23,14 @@ export class Booking {
   ) {}
 
   private res = new Restaurant(30);
-  
-  private bookHistoryobj = new bookingHistory();
+
+  private bookHistory = new bookingHistory();
   public confirmBooking() {
     this.res.initializeSeatAvailblity();
     console.log("Payment done");
     // console.log(this.bookingDate);
-    
-    this.bookHistoryobj.addBookingHistory(
+
+    this.bookHistory.addBookingHistory(
       this.bookingId,
       this.bookingDate,
       this.numOfPerson,
@@ -39,6 +39,7 @@ export class Booking {
       900,
       paymentStatus.PAID
     );
+    this.res.removeSeat(this.bookingDate, this.timeSlot, this.numOfPerson);
     // if (this.res.isAvalible(this.bookingDate,this.timeSlot,this.numOfPerson)) {
 
     //     console.log("Booking is done");
@@ -46,25 +47,41 @@ export class Booking {
     // }
   }
 
-  public cancelBooking(bookingId: string){
-    this.bookHistoryobj.getHistory(bookingId);
-    this.bookHistoryobj.addBookingHistory(
-        this.bookingId,
-        this.bookingDate,
-        this.numOfPerson,
-        this.timeSlot,
-        this.Status,
-        900,
-        paymentStatus.REFUNDED
-      );
-    this.res.addSeat(this.bookingDate,this.timeSlot,this.numOfPerson);
+  public cancelBooking(bookingId: string) {
+    this.bookHistory.getHistory(bookingId);
+    this.bookHistory.addBookingHistory(
+      this.bookingId,
+      this.bookingDate,
+      this.numOfPerson,
+      this.timeSlot,
+      this.Status,
+      900,
+      paymentStatus.REFUNDED
+    );
+    this.res.addSeat(this.bookingDate, this.timeSlot, this.numOfPerson);
     // console.log(this.res.getSeatAvaibility());
-    
-    console.log( this.bookHistoryobj.getHistory(bookingId));
+
+    // console.log(this.bookHistory.getHistory(bookingId));
+  }
+
+  public rescheduleBooking(
+    bookingId: string,
+    bookingDate: string,
+    numOfPerson: number,
+    timeSlot: string
+  ) {
+    (this.bookHistory.updateHistory(bookingId,bookingDate,numOfPerson,timeSlot))
     
   }
 }
 
-const b1 = new Booking("b1","2025-01-29",5,"1 P.M.",BookingStatus.CONFIRMED);
+const b1 = new Booking(
+  "b1",
+  "2025-01-29",
+  5,
+  "1 P.M.",
+  BookingStatus.CONFIRMED
+);
 b1.confirmBooking();
 b1.cancelBooking("b1");
+b1.rescheduleBooking("b1","2025-01-30",7,"2 P.M.")

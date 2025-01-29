@@ -52,6 +52,28 @@ export class bookingHistory {
         customerArr.push(this.bookingHistoryarr[i]);
       }
     }
+
     return customerArr;
+  }
+
+  public updateHistory( bookingId: string,
+    bookingDate: string,
+    numOfPerson: number,
+    timeSlot: string,){
+        let updateArr: any =[];
+
+    for (let i = 0; i < this.bookingHistoryarr.length; i++) {
+        if (this.bookingHistoryarr[i].bookingId == bookingId) {
+          updateArr = this.bookingHistoryarr[i];
+        }
+      }
+      console.log("update");
+      
+      updateArr.bookingDate = bookingDate;
+      updateArr.numOfPerson = numOfPerson;
+      updateArr.timeSlot = timeSlot;
+      console.log(this.bookingHistoryarr);
+      return updateArr;
+      
   }
 }
