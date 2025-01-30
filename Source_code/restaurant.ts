@@ -12,7 +12,7 @@ export class Restaurant {
     private seatAvaibility: SeatAvaibility = {}
   ) {}
 
-  public initializeSeatAvailblity(): void {
+  public initializeSeatAvailability(): void {
     const timeSlots: string[] = [
       "11 A.M.",
       "12 P.M.",
@@ -38,11 +38,11 @@ export class Restaurant {
     }
 
     for (let i = 0; i < dates.length; i++) {
-      const seat: Seat = {};
+      const seats: Seat = {};
       for (let j = 0; j < timeSlots.length; j++) {
-        seat[timeSlots[j]] = this.totalSeat;
+        seats[timeSlots[j]] = this.totalSeat;
       }
-      this.seatAvaibility[dates[i]] = seat;
+      this.seatAvaibility[dates[i]] = seats;
     }
   }
 
@@ -61,13 +61,11 @@ export class Restaurant {
     return false;
   }
 
-  public addSeat(date: string, timeSlot: string, numOfSeat: number): void {
+  public addAvailability(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatAvaibility[date][timeSlot] += numOfSeat;
-    // console.log("Seats updated.");
   }
 
-  public removeSeat(date: string, timeSlot: string, numOfSeat: number): void {
+  public removeAvailability(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatAvaibility[date][timeSlot] -= numOfSeat;
-    // console.log("Seats updated.");
   }
 }

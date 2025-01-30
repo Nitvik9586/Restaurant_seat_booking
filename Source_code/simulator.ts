@@ -1,8 +1,7 @@
 import { Restaurant } from "./restaurant";
-import { BookingHistory } from "./bookingHistory";
-import { Booking, BookingStatus } from "./booking";
-import { Payment, PaymentDetail } from "./payment";
-import { BookingDetails } from "./bookingHistory";
+import { BookingDetails, BookingHistory } from "./bookingHistory";
+import { Booking } from "./booking";
+import { Payment } from "./payment";
 
 class Simulator {
   constructor(
@@ -12,10 +11,10 @@ class Simulator {
 
   setRestaurant(totalSeat: number): void {
     this.restaurant = new Restaurant(totalSeat);
-    this.restaurant.initializeSeatAvailblity();
+    this.restaurant.initializeSeatAvailability();
   }
 
-  simulateBooking(bookingId: string, bookingDate: string, numOfPerson: number, timeSlot: string) {
+  simulateBooking(customerId:string, bookingId: string, bookingDate: string, numOfPerson: number, timeSlot: string) {
 
     const isSeatsAvailable = this.restaurant.isAvalible(bookingDate, timeSlot, numOfPerson);
 
@@ -43,18 +42,23 @@ class Simulator {
       status: payment.getStatus()
     };
 
-    const booking = new Booking(bookingId, bookingDate, numOfPerson, timeSlot, paymentDetail)
+    const booking = new Booking(customerId,bookingId, bookingDate, numOfPerson, timeSlot, paymentDetail)
 
-    const confirmedBooking = booking.confirmBooking();
+    const confirmedBooking = booking.confirm();
     this.bookingHistory.addBookingHistory(confirmedBooking);
-
-    this.restaurant.removeSeat(bookingDate, timeSlot, numOfPerson);
+    
+    this.restaurant.removeAvailability(bookingDate, timeSlot, numOfPerson);
 
   }
 
-  simulateCancelBooking(bookingId: string): void {
+  simulateViewBooking(customerId: string): void {
+    const bookings = this.bookingHistory.getFullBookingHistory(customerId);
+    console.log('Bookings = ', bookings);
+  }
 
-    let booking: BookingDetails | undefined = this.bookingHistory.getBookingHistroy(bookingId);
+  simulatecancel(customerId: string, bookingId: string): void {
+
+    const booking = this.bookingHistory.getBookingHistroy(customerId, bookingId);
 
     if (!booking) return;
     const payment = new Payment(booking.payment.amount);
@@ -63,7 +67,7 @@ class Simulator {
     booking.payment.status = payment.getStatus();
 
 
-    this.restaurant.addSeat(booking.bookingDate, booking.timeSlot, booking.numOfPerson);
+    this.restaurant.addAvailability(booking.bookingDate, booking.timeSlot, booking.numOfPerson);
 
     const paymentDetail = {
       amount: booking.payment.amount,
@@ -71,6 +75,7 @@ class Simulator {
     }
 
     const bookingTocancel = new Booking(
+      booking.customerId,
       booking.bookingId,
       booking.bookingDate,
       booking.numOfPerson,
@@ -78,14 +83,13 @@ class Simulator {
       paymentDetail
     );
 
-    booking = bookingTocancel.cancelBooking(bookingId);
-    this.bookingHistory.updateHistory(booking);
+    const cancelledBooking = bookingTocancel.cancel(bookingId);
+    this.bookingHistory.updateHistory(cancelledBooking);
   }
 
-  simulateReschedule(bookingId: string, bookingDate: string, numOfPerson: number, timeSlot: string) {
-    const oldBooking = this.bookingHistory.getBookingHistroy(bookingId);
-    const isSeatAvailable = this.restaurant.isAvalible(bookingDate, timeSlot, numOfPerson);
-
+  simulateReschedule(customerId: string, bookingId: string, bookingDate: string, numOfPerson: number, timeSlot: string) {
+    const oldBooking = this.bookingHistory.getBookingHistroy(customerId, bookingId);
+    
     if (!oldBooking) return;
 
     if (oldBooking.status == "CANCELLED") {
@@ -93,26 +97,19 @@ class Simulator {
       return;
     }
 
-    if (oldBooking?.bookingDate == bookingDate && oldBooking.timeSlot == timeSlot) {
-      this.restaurant.removeSeat(bookingDate, timeSlot, oldBooking.numOfPerson)
+    if (oldBooking.bookingDate == bookingDate && oldBooking.timeSlot == timeSlot) {
+      this.restaurant.addAvailability(bookingDate, timeSlot, oldBooking.numOfPerson)
     }
+
+    const isSeatAvailable = this.restaurant.isAvalible(bookingDate, timeSlot, numOfPerson); 
 
     if (!isSeatAvailable) {
       console.log(`Reschedule for seats ${numOfPerson} is not available for date ${bookingDate} and time slot ${timeSlot}.`);
-      if (oldBooking?.bookingDate == bookingDate && oldBooking.timeSlot == timeSlot) {
-        this.restaurant.addSeat(bookingDate, timeSlot, oldBooking.numOfPerson)
+      if (oldBooking.bookingDate == bookingDate && oldBooking.timeSlot == timeSlot) {
+        this.restaurant.removeAvailability(bookingDate, timeSlot, oldBooking.numOfPerson)
       }
       return;
     }
-
-    // const updatedBooking: BookingDetails = {
-    //   bookingId: oldBooking.bookingId,
-    //   bookingDate: bookingDate,
-    //   numOfPerson: numOfPerson,
-    //   timeSlot: timeSlot,
-    //   status: oldBooking.status,
-    //   payment: oldBooking.payment
-    // }
 
     if (oldBooking.numOfPerson < numOfPerson) {
       const newNumOfPerson = numOfPerson - oldBooking.numOfPerson
@@ -121,7 +118,7 @@ class Simulator {
       const payment = new Payment(payableAmount)
       payment.process();
       oldBooking.payment.amount += payableAmount;
-      this.restaurant.removeSeat(bookingDate, timeSlot, newNumOfPerson);
+      this.restaurant.removeAvailability(bookingDate, timeSlot, newNumOfPerson);
     } else if (oldBooking.numOfPerson > numOfPerson) {
       const newNumOfPerson = oldBooking.numOfPerson - numOfPerson;
       const payableAmount = (newNumOfPerson) * 10;
@@ -129,22 +126,14 @@ class Simulator {
       const payment = new Payment(payableAmount);
       payment.refund();
 
-      this.restaurant.addSeat(bookingDate, timeSlot, newNumOfPerson);
+      this.restaurant.addAvailability(bookingDate, timeSlot, newNumOfPerson);
       oldBooking.payment.amount -= payableAmount;
     }
     oldBooking.numOfPerson = numOfPerson;
 
 
-    // const updatedBookingI = new Booking(
-    //   oldBooking.bookingId,
-    //   bookingDate,
-    //   numOfPerson,
-    //   timeSlot,
-    //   oldBooking.payment,
-    //   oldBooking.status
-    // )
-
-    const bookingUpdate = new Booking(
+    const bookingUpdate: Booking = new Booking(
+      oldBooking.customerId,
       oldBooking.bookingId,
       oldBooking.bookingDate,
       oldBooking.numOfPerson,
@@ -154,7 +143,7 @@ class Simulator {
 
     // console.log(bookingUpdate);
     
-    const updatedBooking = bookingUpdate.rescheduleBooking()
+    const updatedBooking = bookingUpdate.reschedule()
     this.bookingHistory.updateHistory(updatedBooking)
     // this.bookingHistory.getFullBookingHistory();
   }
@@ -162,10 +151,13 @@ class Simulator {
 
 const s1 = new Simulator();
 s1.setRestaurant(30);
-s1.simulateBooking("b1", "2025-01-30", 5, "1 P.M.")
-s1.simulateBooking("b2", "2025-01-30", 7, "2 P.M.")
-// s1.simulateCancelBooking("b1");
-s1.simulateReschedule("b1", "2025-01-30", 7, "1 P.M.")
-s1.simulateReschedule("b1", "2025-01-30", 11, "1 P.M.") 
+s1.simulateBooking("c1","b1", "2025-01-31", 20, "1 P.M.")
+s1.simulateBooking("c2","b2", "2025-01-31", 5, "1 P.M.")
+s1.simulateBooking("c2","b3", "2025-01-31", 5, "3 P.M.")
+// s1.simulatecancel("b1"); 
+// s1.simulateReschedule("c1", "b1", "2025-01-31", 5, "1 P.M.")
+s1.simulateReschedule("c2", "b2", "2025-01-31", 8, "1 P.M.")
 
-// s1.simulateCancelBooking("b2"); 
+s1.simulateViewBooking('c2');
+
+// s1.simulatecancel("b2"); 
