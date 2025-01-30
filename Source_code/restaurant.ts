@@ -1,4 +1,4 @@
-type SeatAvaibility = {
+export type SeatAvaibility = {
   [date: string]: Seat;
 };
 
@@ -7,12 +7,11 @@ type Seat = {
 };
 
 export class Restaurant {
+  private a : number = 10;
   constructor(
     private totalSeat: number = 0,
-    private seatAvaibility: SeatAvaibility = {}
-  ) {}
-
-  public initializeSeatAvailability(): void {
+    private seatsAvaibility: SeatAvaibility = {}
+  ) {
     const timeSlots: string[] = [
       "11 A.M.",
       "12 P.M.",
@@ -42,30 +41,40 @@ export class Restaurant {
       for (let j = 0; j < timeSlots.length; j++) {
         seats[timeSlots[j]] = this.totalSeat;
       }
-      this.seatAvaibility[dates[i]] = seats;
+      this.seatsAvaibility[dates[i]] = seats;
     }
   }
+  static test(){
+    console.log()
+  }
+
 
   getSeatAvaibility(): SeatAvaibility{
-      return this.seatAvaibility;
+      return this.seatsAvaibility;
   }
 
-  public isAvalible(
+  
+  public isSeatsAvalible(
     date: string,
     timeSlot: string,
-    numOfSeat: number
-  ): boolean {
-    if (this.seatAvaibility[date][timeSlot] >= numOfSeat) {
+    numOfPerson: number
+  ):boolean {
+    const seatAvailability = this.seatsAvaibility[date][timeSlot];
+    if (seatAvailability >= numOfPerson) {
+      console.log(`${numOfPerson}  is available for date ${date} and time slot ${timeSlot}.\n`);
       return true;
     }
+    console.log(`Required seats ${numOfPerson} is not available for date ${date} and time slot ${timeSlot}.`);
     return false;
   }
 
-  public addAvailability(date: string, timeSlot: string, numOfSeat: number): void {
-    this.seatAvaibility[date][timeSlot] += numOfSeat;
+  public addSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
+    this.seatsAvaibility[date][timeSlot] += numOfSeat;
   }
 
-  public removeAvailability(date: string, timeSlot: string, numOfSeat: number): void {
-    this.seatAvaibility[date][timeSlot] -= numOfSeat;
+  public removeSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
+    console.log(numOfSeat,"rrrrrrrrrrrrrrr");
+    
+    this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
 }

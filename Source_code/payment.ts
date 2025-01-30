@@ -4,10 +4,6 @@ export enum PaymentStatus {
     REFUNDED = "REFUNDED",
 }
 
-export type PaymentDetail = {
-    amount: number,
-    status: PaymentStatus
-}
 
 export class Payment {
     constructor(
@@ -16,7 +12,7 @@ export class Payment {
     ) { }
 
     public process(): boolean {
-        const isPaid = this.payAmount();
+        const isPaid = this.payAmount()
         if(isPaid){
             console.log(`Payment of ${this.amount} is paid.\n`)
             this.status = PaymentStatus.PAID;
@@ -33,8 +29,13 @@ export class Payment {
         return paid[i]
     }
 
-    public refund(): void{
-        console.log(`Refund of ${this.amount} is refunded.`);
+    public refund(): void {
+        const cancelationCharge = this.amount/10;
+
+        const refundAmount = this.amount - cancelationCharge;
+
+        console.log(`Cancelation charges is ${cancelationCharge}.
+            \nRefund of ${refundAmount} is refunded.`);
         this.status = PaymentStatus.REFUNDED;
     }
 

@@ -1,5 +1,5 @@
-import { BookingDetails } from "./bookingHistory";
-import { PaymentDetail } from "./payment";
+import { Customer } from "./customer";
+import { Payment } from "./payment";
 
 export enum BookingStatus {
   PENDING = "PENDING",
@@ -8,62 +8,94 @@ export enum BookingStatus {
   RESCHEDULE = "RESCHEDULED"
 }
 
-export class Booking {
+export class Booking  {
   constructor(
     private customerId: string,
-    private bookingId: string,
-    private bookingDate: string,
+    private id: string,
+    private date: string,
     private numOfPerson: number,
     private timeSlot: string,
-    private payment: PaymentDetail,
-    private status: BookingStatus = BookingStatus.PENDING
-  ) {}
+    private status: BookingStatus = BookingStatus.PENDING,
+    private payment: Payment = new Payment()
+  ) { this.payment = new Payment(this.numOfPerson * 10)}
 
-  public confirm(): BookingDetails {
+  public getId(): string {
+    return this.id
+  }
+  
+  public confirm(): void {
+    console.log(`Proceed to pay ${this.payment.getAmount()}...\n`)
+    const isPaymentDone = this.payment.process();
+
+    if (!isPaymentDone) {
+      console.log(`Booking can not be done due to failed payment.\n
+================================================================\n`);
+      return;
+    }
+
     this.status = BookingStatus.CONFIRMED;
-
-    const booking = {
-      customerId: this.customerId,
-      bookingId: this.bookingId,
-      bookingDate: this.bookingDate,
-      numOfPerson: this.numOfPerson,
-      timeSlot: this.timeSlot,
-      status: this.status,
-      payment: this.payment,
-    };
+    //   customerId: this.customerId,
+    //   id: this.id,
+    //   date: this.date,
+    //   numOfPerson: this.numOfPerson,
+    //   timeSlot: this.timeSlot,
+    //   status: this.status,
+    //   payment: this.payment,
+    // };
 
     console.log(`Your booking is confirmed.\n
 ==========================================\n`);
-
-    return booking;
   }
 
-  public cancel(bookingId: string): BookingDetails {
+  public cancel(): void {
+
+    this.payment.refund()
     this.status = BookingStatus.CANCELED;
 
-    const booking = {
-      customerId: this.customerId,
-      bookingId: this.bookingId,
-      bookingDate: this.bookingDate,
-      numOfPerson: this.numOfPerson,
-      timeSlot: this.timeSlot,
-      status: this.status,
-      payment: this.payment,
-    };
-
-    console.log(`Your booking is cancelled.\n
-==========================================\n`);
-
-    return booking;
+    console.log(`Your booking is cancelled.
+      \n==========================================\n`);
+      
   }
 
-  public reschedule(): BookingDetails {
+  getCustomerId(){
+    return this.customerId
+  }
+
+  getDate(){
+    return this.date;
+  }
+
+  getTimeSlot(){
+    return this.timeSlot;
+  }
+
+  getNumOfPerson(){
+    return this.numOfPerson;
+  }
+
+
+  checkSameDateAndTime(bookingDate:string, timeSlot:string):boolean{
+    if (this.date == bookingDate && this.timeSlot == timeSlot) {
+      return true;
+    }
+    return false;
+  }
+  
+  public reschedule(bookingDate: string, numOfPerson: number, timeSlot: string): void {
+    if (this.status == "CANCELLED") {
+      console.log("Your Booking is already cancelled You can't reschedule it.\n");
+      return;
+    }
+
+
+
     this.status = BookingStatus.RESCHEDULE;
+
 
     const booking = {
       customerId: this.customerId,
-      bookingId: this.bookingId,
-      bookingDate: this.bookingDate,
+      id: this.id,
+      date: this.date,
       numOfPerson: this.numOfPerson,
       timeSlot: this.timeSlot,
       status: this.status,
@@ -73,6 +105,6 @@ export class Booking {
     console.log(`Your booking is Reschedulled.\n
 ==========================================\n`);
     
-    return booking;
   }
 }
+
