@@ -1,28 +1,31 @@
-import { Payment, PaymentStatus } from "./payment";
-import { Booking, BookingStatus } from "./booking";
+import { Booking} from "./booking";
 
 
 
 export class Customer {
-  constructor(private customerId: string = '' ,private bookingHistory: Booking[] = []) { }
+  constructor(private id: string ,private bookingHistory: Booking[] = []) { }
 
-  public addBookingHistory(bookingHistory: Booking): void {
-    this.bookingHistory.push(bookingHistory);
+  public getId() {
+    return this.id;
+  }
+
+  public addBooking(booking: Booking): void {
+    this.bookingHistory.push(booking);
     // console.log('new Booking is added to history.')
   }
 
-  getFullBookingHistory() {
-    // const bookings = this.bookingHistory.filter(booking => booking.customerId == customerId)
-    // return bookings;
-    console.log(this.bookingHistory);
+  public viewBookings() {
+    console.log(`Bookings of customer with id ${this.id}.\n`);
     
+    this.bookingHistory.forEach(booking => {
+      console.log(booking)
+    });
   }
 
-  public getBookingHistroy(customerId: string, bookingId: string): Booking | undefined {
-    const booking = this.bookingHistory.find(booking => booking.getCustomerId() == customerId && booking.getId() == bookingId)
-    console.log(this.bookingHistory);
-    
-    
+  public getBookingById(bookingId: string): Booking | undefined {
+    const booking = this.bookingHistory.find(booking => booking.getId() == bookingId)
+    // console.log(this.bookingHistory);
+
     if (!booking) {
       console.log('Booking not found.')
     } else {
@@ -31,7 +34,7 @@ export class Customer {
     }
   }
 
-  public updateHistory(booking: Booking) {
+  public updateBooking(booking: Booking) {
     for (let i = 0; i < this.bookingHistory.length; i++) {
       if (this.bookingHistory[i].getId() == booking.getId()) {
         this.bookingHistory[i] = booking;

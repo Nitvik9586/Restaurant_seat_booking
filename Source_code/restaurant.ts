@@ -7,7 +7,7 @@ type Seat = {
 };
 
 export class Restaurant {
-  private a : number = 10;
+
   constructor(
     private totalSeat: number = 0,
     private seatsAvaibility: SeatAvaibility = {}
@@ -29,10 +29,10 @@ export class Restaurant {
     const dates: string[] = [];
 
     for (let i = 0; i < 7; i++) {
-      
+
       const date: string = new Date(start.setDate(start.getDate() + 1))
-      .toISOString()
-      .split("T")[0];
+        .toISOString()
+        .split("T")[0];
       dates.push(date);
     }
 
@@ -44,24 +44,21 @@ export class Restaurant {
       this.seatsAvaibility[dates[i]] = seats;
     }
   }
-  static test(){
-    console.log()
+
+  getSeatAvaibility(): SeatAvaibility {
+     console.log(this.seatsAvaibility);
+     return this.seatsAvaibility;
+    ;
   }
 
-
-  getSeatAvaibility(): SeatAvaibility{
-      return this.seatsAvaibility;
-  }
-
-  
   public isSeatsAvalible(
     date: string,
     timeSlot: string,
     numOfPerson: number
-  ):boolean {
+  ): boolean {
     const seatAvailability = this.seatsAvaibility[date][timeSlot];
     if (seatAvailability >= numOfPerson) {
-      console.log(`${numOfPerson}  is available for date ${date} and time slot ${timeSlot}.\n`);
+      console.log(`${numOfPerson} seats is available for date ${date} and time slot ${timeSlot}.\n`);
       return true;
     }
     console.log(`Required seats ${numOfPerson} is not available for date ${date} and time slot ${timeSlot}.`);
@@ -73,8 +70,17 @@ export class Restaurant {
   }
 
   public removeSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
-    console.log(numOfSeat,"rrrrrrrrrrrrrrr");
-    
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
+
+  // updateSeatAvailability(oldNumberOfPerson: number, newNumberOfPerson: number, bookingDate: string, timeSlot: string) {
+    
+  //   console.log(oldNumberOfPerson,newNumberOfPerson);
+  //   // if (oldNumberOfPerson < newNumberOfPerson) { 
+     
+  //     this.removeSeatsAvailability(bookingDate, timeSlot, newNumberOfPerson);
+  //   // } else if (oldNumberOfPerson > newNumberOfPerson) {
+  //   //   this.removeSeatsAvailability(bookingDate, timeSlot, newNumberOfPerson);
+  //   // }
+  // }
 }

@@ -11,13 +11,13 @@ export class Payment {
         private status: PaymentStatus = PaymentStatus.PENDING
     ) { }
 
-    public process(): boolean {
+    public process(amount:number): boolean {
         const isPaid = this.payAmount()
         if(isPaid){
-            console.log(`Payment of ${this.amount} is paid.\n`)
+            console.log(`Payment of ${amount} is paid.\n`)
             this.status = PaymentStatus.PAID;
         } else {
-            console.log(`Payment of ${this.amount} is failed.\n`)
+            console.log(`Payment of ${amount} is failed.\n`)
         }
         return isPaid;
     }
@@ -26,16 +26,11 @@ export class Payment {
         const paid = [false, true];
 
         let i = Math.random() < 0.9 ? 1:0;
-        return paid[i]
+        return paid[1]
     }
 
-    public refund(): void {
-        const cancelationCharge = this.amount/10;
-
-        const refundAmount = this.amount - cancelationCharge;
-
-        console.log(`Cancelation charges is ${cancelationCharge}.
-            \nRefund of ${refundAmount} is refunded.`);
+    public refund(refundAmount:number): void {
+                console.log(`\nRefund of ${refundAmount} is refunded.`);
         this.status = PaymentStatus.REFUNDED;
     }
 
@@ -43,7 +38,16 @@ export class Payment {
         return this.amount;
     }
 
+    public setAmount(amount:number): void {
+         this.amount = amount;
+    }
+
+
     public getStatus(): PaymentStatus {
         return this.status;
+    }
+
+    public setStatus(status:PaymentStatus): void {
+         this.status = status;
     }
 }
