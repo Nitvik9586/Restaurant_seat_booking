@@ -1,134 +1,59 @@
 import { Restaurant } from "./restaurant";
-import { CustomerManager } from "./customerManager";
-import { Booking } from "./booking";
-import { Customer } from "./customer";
+import { CustomerManager } from "./customerHandler";
+import { BookingHandler } from "./bookingHandler";
 
 class Simulator {
-  constructor(
-    private restaurant: Restaurant = new Restaurant(),
-    private customerManager: CustomerManager = new CustomerManager(),
-    private bookingCount: number = 1
-  ) { }
+    private bookingHandler: BookingHandler;
 
-  setRestaurant(totalSeat: number): void {
-    this.restaurant = new Restaurant(totalSeat);
-  }
-
-  CustomerManager(): CustomerManager {
-    return this.customerManager;
-  }
-
-  simulateBooking(customerId: string, bookingDate: string, numOfPerson: number, timeSlot: string) {
-    const customer = this.customerManager.getCustomer(customerId);
-    
-    if (!customer) return;
-    console.log(`Booking started by customer with id ${customerId}.\n `);
-    
-    const isSeatAvailable = this.restaurant.isSeatsAvalible(bookingDate, timeSlot, numOfPerson);
-    if (!isSeatAvailable) return;
-
-    const bookingId = `b${this.bookingCount}`;
-
-    const booking = new Booking(customerId, bookingId, bookingDate, numOfPerson, timeSlot);
-
-    const isBookingConfirmed = booking.confirm();
-    
-    if (!isBookingConfirmed) return;
-
-    customer.addBooking(booking);
-    this.bookingCount++;
-    this.restaurant.removeSeatsAvailability(bookingDate, timeSlot, numOfPerson);
-    // this.customerManager.viewCustomers();
-    // this.customer.getFullBookingHistory();
-    // this.restaurant.getSeatAvaibility();
-
-  }
-
-  simulateViewBooking(customerId: string) {
-    const customer = this.customerManager.getCustomer(customerId);
-
-    if (!customer) return;
-
-    customer.viewBookings();
-  }
-
-  simulatecancel(customerId: string, bookingId: string): void {
-    const customer = this.customerManager.getCustomer(customerId)
-
-    if (!customer) return;
-    console.log(`Booking cancelation started by customer with id ${customerId}.\n `);
-
-    const booking = customer.getBookingById(bookingId);
-
-    console.log(`Cancelation started for booking ID ${bookingId}.\n `);
-
-    if (!booking) return;
-
-    booking.cancel();
-
-    this.restaurant.addSeatsAvailability(booking.getDate(), booking.getTimeSlot(), booking.getNumOfPerson());
-
-    customer.updateBooking(booking);
-  }
-
-  simulateReschedule(customerId: string, bookingId: string, bookingDate: string, numOfPerson: number, timeSlot: string) {
-    const customer = this.customerManager.getCustomer(customerId);
-
-    if (!customer) return;
-    console.log(`Reschedule process started by customer with ID ${customerId}.\n`)
-
-    const oldBooking = customer.getBookingById(bookingId);
-    
-    if (!oldBooking) return;
-    console.log(`Reschedule for booking ID ${bookingId} is started.`);
-
-    const isSameBookingDateAndTime = oldBooking.checkSameDateAndTime(bookingDate, timeSlot)
-
-    if (isSameBookingDateAndTime) {
-      this.restaurant.addSeatsAvailability(bookingDate, timeSlot, oldBooking.getNumOfPerson())
+    constructor(
+        private restaurant: Restaurant = new Restaurant(),
+        private customerManager: CustomerManager = new CustomerManager()
+    ) {
+        this.bookingHandler = new BookingHandler(this.restaurant);
     }
 
-    const isSeatAvailable = this.restaurant.isSeatsAvalible(bookingDate, timeSlot, numOfPerson);
-
-    if (!isSeatAvailable) {
-      if (isSameBookingDateAndTime) {
-        this.restaurant.removeSeatsAvailability(bookingDate, timeSlot, oldBooking.getNumOfPerson())
-      }
-      return;
+    setRestaurant(totalSeat: number): void {
+        this.restaurant = new Restaurant(totalSeat);
+        this.bookingHandler = new BookingHandler(this.restaurant);
     }
 
-    const isRescheduled = oldBooking.reschedule(bookingDate, numOfPerson, timeSlot);
-    if (!isRescheduled) {
-      this.restaurant.removeSeatsAvailability(bookingDate, timeSlot, oldBooking.getNumOfPerson())
-      return
-    };
-    this.restaurant.removeSeatsAvailability(bookingDate, timeSlot, numOfPerson);
+    getCustomerManager(): CustomerManager {
+        return this.customerManager;
+    }
 
-    if (!isSameBookingDateAndTime) {
-      this.restaurant.addSeatsAvailability(oldBooking.getDate(), oldBooking.getTimeSlot(), oldBooking.getNumOfPerson())
-    } 
+    simulateBooking(customerId: string, bookingDate: string, numOfPerson: number, timeSlot: string) {
+        const customer = this.customerManager.getCustomer(customerId);
+        if (!customer) return;
 
-    customer.updateBooking(oldBooking)
-    // this.customerManager.viewCustomers();
-    // customer.viewBookings();
-    // this.restaurant.getSeatAvaibility()
-  }
+        console.log(`Booking started by customer with ID ${customerId}.\n`);
+        this.bookingHandler.createBooking(customer, bookingDate, numOfPerson, timeSlot);
+    }
+
+    simulateCancel(customerId: string, bookingId: string) {
+        const customer = this.customerManager.getCustomer(customerId);
+        if (!customer) return;
+
+        console.log(`Cancelling booking with ID ${bookingId}...`);
+        this.bookingHandler.cancelBooking(customer, bookingId);
+    }
+
+    simulateReschedule(customerId: string, bookingId: string, newDate: string, newNumOfPerson: number, newTimeSlot: string) {
+        const customer = this.customerManager.getCustomer(customerId);
+        if (!customer) return;
+
+        console.log(`Rescheduling booking ${bookingId}...`);
+        this.bookingHandler.rescheduleBooking(customer, bookingId, newDate, newNumOfPerson, newTimeSlot);
+    }
 }
 
 const s1 = new Simulator();
 s1.setRestaurant(30);
-s1.CustomerManager().addCustomer('c1');
-s1.CustomerManager().addCustomer('c2');
-s1.simulateBooking("c1", "2025-02-07", 20, "1 P.M.")
-s1.simulateBooking("c1", "2025-02-07", 20, "2 P.M.")
-s1.simulateBooking("c2", "2025-02-07", 10, "1 P.M.")
-// s1.simulateBooking("c2", "b3", "2025-01-31", 5, "3 P.M.")
+s1.getCustomerManager().addCustomer('c1');
+s1.getCustomerManager().addCustomer('c2');
+s1.simulateBooking("c1", "2025-02-10", 10, "1 P.M.")
+s1.simulateBooking("c1", "2025-02-10", 5, "1 P.M.")
+// s1.simulateBooking("c2", "2025-02-07", 10, "1 P.M.")
 
-// s1.simulatecancel("c1", "b1");
-// s1.simulatecancel("c2","b2"); 
-
-// s1.simulateReschedule("c1", "b1", "2025-02-07", 5, "11 P.M.")
-// s1.simulateReschedule("c1", "b1", "2025-02-01", 10, "1 P.M.")
-// s1.simulateReschedule("c2", "b2", "2025-01-31", 8, "1 P.M.")
-
-// s1.simulateViewBooking('c1')
+s1.simulateCancel("c1", "b1")
+s1.simulateReschedule('c1', 'b2', "2025-02-10", 15, "1 P.M.")
+// s1.getCustomerManager().viewCustomers();

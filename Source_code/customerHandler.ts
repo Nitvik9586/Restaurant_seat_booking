@@ -14,17 +14,16 @@ export class CustomerManager {
 
     getCustomer(customerId: string): Customer | undefined{
         const customer = this.customers.find(customer => customer.getId() == customerId) ;
-        
         return customer ;
     }
 
-    viewCustomers(): Customer[] {
+    viewCustomers(): void {
         console.log(`Customers: \n`);
 
-        this.customers.forEach(customer => {
-            console.log(customer.viewBookings())
-        });
-        return this.customers;
+        // this.customers.forEach(customer => {
+        //     console.log(customer.viewBookings())
+        // });
+        console.log(this.customers);
     }
 
 }

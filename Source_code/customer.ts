@@ -33,15 +33,4 @@ export class Customer {
       return booking;
     }
   }
-
-  public updateBooking(booking: Booking) {
-    for (let i = 0; i < this.bookingHistory.length; i++) {
-      if (this.bookingHistory[i].getId() == booking.getId()) {
-        this.bookingHistory[i] = booking;
-      }
-    }
-    // console.log("Updated booking is updated in history.");
-  }
-
-
 }

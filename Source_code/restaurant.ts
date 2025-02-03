@@ -45,13 +45,13 @@ export class Restaurant {
     }
   }
 
-  getSeatAvaibility(): SeatAvaibility {
+  getSeatAvailability(): SeatAvaibility {
      console.log(this.seatsAvaibility);
      return this.seatsAvaibility;
     ;
   }
 
-  public isSeatsAvalible(
+  public isSeatsAvailable(
     date: string,
     timeSlot: string,
     numOfPerson: number
@@ -61,7 +61,7 @@ export class Restaurant {
       console.log(`${numOfPerson} seats is available for date ${date} and time slot ${timeSlot}.\n`);
       return true;
     }
-    console.log(`Required seats ${numOfPerson} is not available for date ${date} and time slot ${timeSlot}.`);
+    console.log(`Required seats ${numOfPerson} is not available for date ${date} and time slot ${timeSlot}.\n`);
     return false;
   }
 
@@ -73,14 +73,4 @@ export class Restaurant {
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
 
-  // updateSeatAvailability(oldNumberOfPerson: number, newNumberOfPerson: number, bookingDate: string, timeSlot: string) {
-    
-  //   console.log(oldNumberOfPerson,newNumberOfPerson);
-  //   // if (oldNumberOfPerson < newNumberOfPerson) { 
-     
-  //     this.removeSeatsAvailability(bookingDate, timeSlot, newNumberOfPerson);
-  //   // } else if (oldNumberOfPerson > newNumberOfPerson) {
-  //   //   this.removeSeatsAvailability(bookingDate, timeSlot, newNumberOfPerson);
-  //   // }
-  // }
 }
