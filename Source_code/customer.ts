@@ -1,12 +1,18 @@
-import { Booking} from "./booking";
-
-
+import { Booking } from "./booking";
 
 export class Customer {
-  constructor(private id: string ,private bookingHistory: Booking[] = []) { }
+  constructor(private id: string,
+    private name: string,
+    private contactNum: string,
+    private email: string,
+    private bookingHistory: Booking[] = []) { }
 
   public getId() {
     return this.id;
+  }
+
+  getName(): string {
+    return this.name;
   }
 
   public addBooking(booking: Booking): void {
@@ -14,23 +20,16 @@ export class Customer {
     // console.log('new Booking is added to history.')
   }
 
-  public viewBookings() {
-    console.log(`Bookings of customer with id ${this.id}.\n`);
-    
-    this.bookingHistory.forEach(booking => {
-      console.log(booking)
-    });
+  public getBookingById(bookingId: string): Booking {
+    return this.bookingHistory.find(booking => booking.getId() == bookingId) as Booking
   }
 
-  public getBookingById(bookingId: string): Booking | undefined {
-    const booking = this.bookingHistory.find(booking => booking.getId() == bookingId)
-    // console.log(this.bookingHistory);
+  public viewBookings(): void {
+    console.log(`Bookigs of ${this.name}\n `);
 
-    if (!booking) {
-      console.log('Booking not found.')
-    } else {
-      // console.log('Booking found.')
-      return booking;
-    }
+    this.bookingHistory.forEach(booking => {
+      console.log(booking);
+
+    });
   }
 }

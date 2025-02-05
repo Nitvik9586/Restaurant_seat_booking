@@ -1,29 +1,24 @@
+import { Booking, BookingStatus } from "./booking";
+import { Customer } from "./customer";
+import { TimeSlot } from "./timeSlot";
+
 export type SeatAvaibility = {
-  [date: string]: Seat;
+  [date: string]: { [timeSlot: string]: number };
 };
 
-type Seat = {
-  [timeSlot: string]: number;
+type TimeSlotCapacity = {
+  [timeSlot: string]: number
 };
 
 export class Restaurant {
+  private bookingCount: number = 0;
 
   constructor(
     private totalSeat: number = 0,
-    private seatsAvaibility: SeatAvaibility = {}
+    private seatsAvaibility: SeatAvaibility = {},
+    private timeSlot = new TimeSlot(),
+    private customers: Customer[] = []
   ) {
-    const timeSlots: string[] = [
-      "11 A.M.",
-      "12 P.M.",
-      "1 P.M.",
-      "2 P.M.",
-      "3 P.M.",
-      "7 P.M.",
-      "8 P.M.",
-      "9 P.M.",
-      "10 P.M.",
-      "11 P.M.",
-    ];
 
     const start = new Date();
     const dates: string[] = [];
@@ -37,32 +32,45 @@ export class Restaurant {
     }
 
     for (let i = 0; i < dates.length; i++) {
-      const seats: Seat = {};
-      for (let j = 0; j < timeSlots.length; j++) {
-        seats[timeSlots[j]] = this.totalSeat;
+      const timeSlotCapacity: TimeSlotCapacity = {};
+      for (let j = 0; j < this.timeSlot.getTimeSlots().length; j++) {
+        timeSlotCapacity[this.timeSlot.getTimeSlots()[j]] = this.totalSeat;
       }
-      this.seatsAvaibility[dates[i]] = seats;
+      this.seatsAvaibility[dates[i]] = timeSlotCapacity;
     }
   }
 
   getSeatAvailability(): SeatAvaibility {
-     console.log(this.seatsAvaibility);
-     return this.seatsAvaibility;
+    console.log(this.seatsAvaibility);
+    return this.seatsAvaibility;
     ;
   }
 
-  public isSeatsAvailable(
-    date: string,
-    timeSlot: string,
-    numOfPerson: number
-  ): boolean {
+  private generateBookingId(): string {
+    return `b${this.bookingCount}`;
+  }
+
+  public isSeatsAvailable(date: string, timeSlot: string, numOfSeat: number): boolean {
     const seatAvailability = this.seatsAvaibility[date][timeSlot];
-    if (seatAvailability >= numOfPerson) {
-      console.log(`${numOfPerson} seats is available for date ${date} and time slot ${timeSlot}.\n`);
+    if (seatAvailability >= numOfSeat) {
+      console.log(`${numOfSeat} seats is available for date ${date} and time slot ${timeSlot}.\n`);
       return true;
     }
-    console.log(`Required seats ${numOfPerson} is not available for date ${date} and time slot ${timeSlot}.\n`);
+    console.log(`Required seats ${numOfSeat} is not available for date ${date} and time slot ${timeSlot}.\n`);
     return false;
+  }
+
+  showAvailableSeat(date: string, numOfSeat: number) {
+    let availableTimeSlot: TimeSlotCapacity = {};
+
+    for (let i = 0; i < this.timeSlot.getTimeSlots().length; i++) {
+
+      if (this.seatsAvaibility[date][this.timeSlot.getTimeSlots()[i]] >= numOfSeat) {
+        availableTimeSlot[this.timeSlot.getTimeSlots()[i]] = this.seatsAvaibility[date][this.timeSlot.getTimeSlots()[i]]
+      }
+    }
+
+    console.log(availableTimeSlot);
   }
 
   public addSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
@@ -73,4 +81,118 @@ export class Restaurant {
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
 
+  registerCustomer(cutomerId: string, name: string, contactNum: string, email: string) {
+    if (this.getCustomer(cutomerId)) {
+      return;
+    }
+
+    const customer = new Customer(cutomerId, name, contactNum, email);
+    this.customers.push(customer);
+  }
+
+  getCustomer(customerId: string): Customer {
+    const customer = this.customers.find(customer => customer.getId() == customerId);
+    return customer as Customer;
+  }
+
+  bookSeat(customerId: string, date: string, timeSlot: string, numOfSeat: number): void {
+    const customer = this.getCustomer(customerId);
+
+    if (this.isSeatsAvailable(date, timeSlot, numOfSeat)) {
+
+      console.log(`Booking started by ${customer.getName()}\n`);
+
+      const bookingId = this.generateBookingId();
+
+      const booking = new Booking(bookingId, date, numOfSeat, timeSlot)
+
+      if (booking.confirm()) {
+        customer.addBooking(booking);
+
+        this.removeSeatsAvailability(date, timeSlot, numOfSeat);
+
+        this.bookingCount++;
+
+        console.log('Your booking confirmed.');
+        // customer.viewBookings();
+        return;
+      }
+      console.log('Your booking is not confirmed.');
+      return;
+    }
+    console.log(`Seats are not available for selected timeslot.
+                Please select another time slot.`);
+
+  }
+
+  cancleSeat(customerId: string, bookingId: string): void {
+    const customer = this.getCustomer(customerId);
+
+    const booking = customer.getBookingById(bookingId);
+
+
+    booking.cancel();
+
+    if (booking.getStatus() == BookingStatus.CANCELLED) {
+      console.log("Your booking is cancelled. \n ");
+
+      this.addSeatsAvailability(booking.getDate(), booking.getTimeSlot(), booking.getnumOfSeat());
+    }
+
+    console.log("Your booking cancelation failed due to some issue.\n ");
+    return;
+  }
+
+  rescheduleSeat(customerId: string, bookingId: string, newDate: string, newnumOfSeat: number, newTimeSlot: string) {
+    const customer = this.getCustomer(customerId);
+
+    const booking = customer.getBookingById(bookingId);
+
+    const oldDate = booking.getDate()
+    const oldTimeSlot = booking.getTimeSlot()
+    const oldNumPerson = booking.getnumOfSeat()
+
+    if (booking.getStatus() == BookingStatus.CANCELLED) {
+      console.log("Cancelled booking can not be rescheduled.\n");
+      return;
+    }
+
+    const isSameDateTime = booking.checkSameDateAndTime(newDate, newTimeSlot);
+
+    if (isSameDateTime) {
+      this.addSeatsAvailability(newDate, newTimeSlot, booking.getnumOfSeat());
+    }
+
+    if (this.isSeatsAvailable(newDate, newTimeSlot, newnumOfSeat)) {
+      booking.reschedule(newDate, newnumOfSeat, newTimeSlot);
+
+      if (booking.getStatus() == BookingStatus.RESCHEDULE) {
+        this.removeSeatsAvailability(newDate, newTimeSlot, newnumOfSeat);
+
+        if (!isSameDateTime) {
+          this.addSeatsAvailability(oldDate, oldTimeSlot ,oldNumPerson)
+        }
+        
+      }
+
+      console.log(`Rescheduled booking:`,booking);        
+      return;
+    }
+
+    if (isSameDateTime) {
+      this.removeSeatsAvailability(newDate, newTimeSlot, booking.getnumOfSeat());
+    }
+
+    console.log('Reschedule is failed.\n');
+    
+  }
+
+  viewCustomersBookings(): void {
+    this.customers.forEach(customer => {
+      console.log(customer);
+      // customer.viewBookings()
+    })
+  }
 }
+
+
