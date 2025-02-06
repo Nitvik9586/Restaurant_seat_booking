@@ -46,7 +46,7 @@ export class Booking {
     return this.date == newDate && this.timeSlot == newTimeSlot;
   }
 
-  public confirm(): boolean {
+  public confirm(): void {
     console.log(`Proceed to pay ${this.payment.getAmount()}...\n`)
 
     this.payment.process(this.payment.getAmount());
@@ -54,14 +54,13 @@ export class Booking {
     if (this.payment.getStatus() == PaymentStatus.PAID) {
       this.status = BookingStatus.CONFIRMED;
 
-      console.log(`Your booking is confirmed and Booking ID is ${this.id}\n
-  ==========================================\n`);
-      return true;
+      console.log(`Your booking is confirmed and Booking ID is ${this.id}.\n`);
+      return;
     }
 
     console.log(`Booking can not be done due to failed payment.\n
       ================================================================\n`);
-    return false;
+    return;
   }
 
   public cancel(): void {

@@ -50,7 +50,7 @@ export class Restaurant {
     return `b${this.bookingCount}`;
   }
 
-  public isSeatsAvailable(date: string, timeSlot: string, numOfSeat: number): boolean {
+  isSeatsAvailable(date: string, timeSlot: string, numOfSeat: number): boolean {
     const seatAvailability = this.seatsAvaibility[date][timeSlot];
     if (seatAvailability >= numOfSeat) {
       console.log(`${numOfSeat} seats is available for date ${date} and time slot ${timeSlot}.\n`);
@@ -60,24 +60,25 @@ export class Restaurant {
     return false;
   }
 
-  showAvailableSeat(date: string, numOfSeat: number) {
+  showAvailableTimeSlots(date: string, numOfSeat: number) {
     let availableTimeSlot: TimeSlotCapacity = {};
 
     for (let i = 0; i < this.timeSlot.getTimeSlots().length; i++) {
-
-      if (this.seatsAvaibility[date][this.timeSlot.getTimeSlots()[i]] >= numOfSeat) {
-        availableTimeSlot[this.timeSlot.getTimeSlots()[i]] = this.seatsAvaibility[date][this.timeSlot.getTimeSlots()[i]]
+      const timeSlot = this.timeSlot.getTimeSlots()[i];
+      
+      if (this.seatsAvaibility[date][timeSlot] >= numOfSeat) {
+          availableTimeSlot[timeSlot] = this.seatsAvaibility[date][timeSlot];
       }
-    }
-
-    console.log(availableTimeSlot);
   }
 
-  public addSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
+    console.log(`Available slots for ${date} : `, availableTimeSlot,'\n');
+  }
+
+  addSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatsAvaibility[date][timeSlot] += numOfSeat;
   }
 
-  public removeSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
+  removeSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
 
@@ -100,20 +101,22 @@ export class Restaurant {
 
     if (this.isSeatsAvailable(date, timeSlot, numOfSeat)) {
 
-      console.log(`Booking started by ${customer.getName()}\n`);
+      console.log(`Booking started by ${customer.getName()}...\n`);
 
       const bookingId = this.generateBookingId();
 
       const booking = new Booking(bookingId, date, numOfSeat, timeSlot)
 
-      if (booking.confirm()) {
+      booking.confirm();
+
+      if (booking.getStatus() == BookingStatus.CONFIRMED) {
         customer.addBooking(booking);
 
         this.removeSeatsAvailability(date, timeSlot, numOfSeat);
 
         this.bookingCount++;
 
-        console.log('Your booking confirmed.');
+        console.log('Your booking confirmed.\n===============================================\n');
         // customer.viewBookings();
         return;
       }
@@ -122,7 +125,6 @@ export class Restaurant {
     }
     console.log(`Seats are not available for selected timeslot.
                 Please select another time slot.`);
-
   }
 
   cancleSeat(customerId: string, bookingId: string): void {
@@ -170,12 +172,12 @@ export class Restaurant {
         this.removeSeatsAvailability(newDate, newTimeSlot, newnumOfSeat);
 
         if (!isSameDateTime) {
-          this.addSeatsAvailability(oldDate, oldTimeSlot ,oldNumPerson)
+          this.addSeatsAvailability(oldDate, oldTimeSlot, oldNumPerson)
         }
-        
+
       }
 
-      console.log(`Rescheduled booking:`,booking);        
+      console.log(`Rescheduled booking:`, booking);
       return;
     }
 
@@ -184,7 +186,7 @@ export class Restaurant {
     }
 
     console.log('Reschedule is failed.\n');
-    
+
   }
 
   viewCustomersBookings(): void {

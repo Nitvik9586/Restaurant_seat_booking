@@ -35,17 +35,17 @@ class Simulator {
 
 const s1 = new Simulator();
 s1.setRestaurant(30)
-s1.getRestaurant().registerCustomer('c1', "nitvik", "+86385872", "nitvik@gmail.com");
-s1.getRestaurant().registerCustomer('c2', "jayraj", "97385872", "jayraj@gmail.com");
-
-s1.simulateBooking('c1', "2025-02-10", 10, "1 P.M.");
-// s1.simulateBooking('c1', "2025-02-10", 10, "2 P.M.")
-// s1.simulateBooking('c2', "2025-02-10", 5, "1 P.M.")
-// s1.simulateBooking('c1', "2025-02-10", 10, "3 P.M.")
-s1.simulateReschedule('c1', 'b0', "2025-02-11", 150, "2 P.M.")
-s1.getRestaurant().showAvailableSeat("2025-02-11",1);
+s1.getRestaurant().registerCustomer('c1', "nitvik", "9586764635", "nitvik@gmail.com");
+s1.getRestaurant().registerCustomer('c2', "jayraj", "9738587203", "jayraj@gmail.com");
+s1.getRestaurant().getSeatAvailability()
+s1.getRestaurant().showAvailableTimeSlots("2025-02-12",10);
+s1.simulateBooking('c1', "2025-02-12", 10, "1 P.M.");
+// s1.simulateBooking('c1', "2025-02-12", 10, "2 P.M.")
+// s1.simulateBooking('c2', "2025-02-12", 5, "1 P.M.")
+// s1.simulateBooking('c1', "2025-02-12", 10, "3 P.M.")
+s1.simulateReschedule('c1', 'b0', "2025-02-13", 20, "2 P.M.")
 // s1.simulateCancel("c1", "b1")
 s1.simulateViewBookings();
 
-// s1.simulateBooking("c2", "2025-02-07", 10, "1 P.M.")
-// s1.simulateBooking("c2", "2025-02-10", 5, "1 P.M.")
+// s1.simulateBooking("c2", "2025-02-12", 10, "1 P.M.")
+// s1.simulateBooking("c2", "2025-02-13", 5, "1 P.M.")
