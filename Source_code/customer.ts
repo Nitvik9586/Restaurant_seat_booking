@@ -60,6 +60,7 @@ export class Customer {
         // customer.viewBookings();
         return;
       }
+      
       console.log('Your booking is not confirmed.');
       this.bookingCount--;
       return;

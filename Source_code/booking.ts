@@ -85,35 +85,31 @@ export class Booking {
   }
 
   public reschedule(newDate: string, newnumOfSeat: number, newTimeSlot: string): void {
+    const seatsToReschedule: number = newnumOfSeat - this.numOfSeat;
+    const diffInAmount = (seatsToReschedule) * Booking.PRICE_PER_SEAT;
+    
+    let totalAmount = this.payment.getAmount();
+    if (seatsToReschedule > 0) {
+      const isPaymentDone = this.payment.process(diffInAmount);
 
-    if (this.numOfSeat < newnumOfSeat) {
-      const numOfSeat = newnumOfSeat - this.numOfSeat
-      const payableAmount = (numOfSeat) * Booking.PRICE_PER_SEAT;
-      const totalPayment = newnumOfSeat * Booking.PRICE_PER_SEAT;
+      if (!isPaymentDone) return;
 
-      const isPayment = this.payment.process(payableAmount);
+      totalAmount = newnumOfSeat * Booking.PRICE_PER_SEAT;
+    } else if (seatsToReschedule < 0) {
+      this.payment.refund(-diffInAmount);
 
-      if (!isPayment) {
-        return;
-      }
-      this.payment.setAmount(totalPayment);
-    } else if (this.numOfSeat > newnumOfSeat) {
-      const numOfSeat = this.numOfSeat - newnumOfSeat;
-      const refundAmount = (numOfSeat) * Booking.PRICE_PER_SEAT;
-      const totalAmount = this.payment.getAmount() - refundAmount;
-
-      this.payment.refund(refundAmount);
-      this.payment.setAmount(totalAmount);
+      totalAmount = this.payment.getAmount() + diffInAmount;
       this.payment.setStatus(PaymentStatus.PAID);
     }
-
+    
     this.date = newDate;
     this.numOfSeat = newnumOfSeat;
     this.timeSlot = newTimeSlot;
+    this.payment.setAmount(totalAmount);
     this.status = BookingStatus.RESCHEDULE;
 
     console.log(`Your booking is Reschedulled.\n
-      ==========================================\n`);
+==========================================\n`);
   }
 }
 

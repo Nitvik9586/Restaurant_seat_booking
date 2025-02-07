@@ -46,9 +46,9 @@ s1.simulateBooking('c1', "2025-02-12", 10, "1 P.M.");
 // s1.simulateBooking('c2', "2025-02-12", 5, "1 P.M.")
 // s1.simulateBooking('c1', "2025-02-12", 10, "3 P.M.")
 // s1.simulateCancel("c1", "b1")
-s1.simulateReschedule('c1', 'b1', "2025-02-13", 20, "2 P.M.")
-s1.simulateViewBookings();
-s1.getRestaurant().showAvailableTimeSlots("2025-02-13",10);
+s1.simulateReschedule('c1', 'b1', "2025-02-12", 15, "1 P.M.")
+// s1.simulateViewBookings();
+// s1.getRestaurant().showAvailableTimeSlots("2025-02-13",10);
 
 // s1.simulateBooking("c2", "2025-02-12", 10, "1 P.M.")
 // s1.simulateBooking("c2", "2025-02-13", 5, "1 P.M.")
