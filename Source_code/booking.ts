@@ -13,6 +13,7 @@ export class Booking {
 
   private payment: Payment;
   constructor(
+    private customerId: string,
     private id: string,
     private date: string,
     private numOfSeat: number,

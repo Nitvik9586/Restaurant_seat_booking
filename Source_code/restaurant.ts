@@ -11,7 +11,7 @@ type TimeSlotCapacity = {
 };
 
 export class Restaurant {
-  private bookingCount: number = 0;
+
 
   constructor(
     private totalSeat: number = 0,
@@ -44,10 +44,6 @@ export class Restaurant {
     console.log(this.seatsAvaibility);
     return this.seatsAvaibility;
     ;
-  }
-
-  private generateBookingId(): string {
-    return `b${this.bookingCount}`;
   }
 
   isSeatsAvailable(date: string, timeSlot: string, numOfSeat: number): boolean {
@@ -94,99 +90,6 @@ export class Restaurant {
   getCustomer(customerId: string): Customer {
     const customer = this.customers.find(customer => customer.getId() == customerId);
     return customer as Customer;
-  }
-
-  bookSeat(customerId: string, date: string, timeSlot: string, numOfSeat: number): void {
-    const customer = this.getCustomer(customerId);
-
-    if (this.isSeatsAvailable(date, timeSlot, numOfSeat)) {
-
-      console.log(`Booking started by ${customer.getName()}...\n`);
-
-      const bookingId = this.generateBookingId();
-
-      const booking = new Booking(bookingId, date, numOfSeat, timeSlot)
-
-      booking.confirm();
-
-      if (booking.getStatus() == BookingStatus.CONFIRMED) {
-        customer.addBooking(booking);
-
-        this.removeSeatsAvailability(date, timeSlot, numOfSeat);
-
-        this.bookingCount++;
-
-        console.log('Your booking confirmed.\n===============================================\n');
-        // customer.viewBookings();
-        return;
-      }
-      console.log('Your booking is not confirmed.');
-      return;
-    }
-    console.log(`Seats are not available for selected timeslot.
-                Please select another time slot.`);
-  }
-
-  cancleSeat(customerId: string, bookingId: string): void {
-    const customer = this.getCustomer(customerId);
-
-    const booking = customer.getBooking(bookingId);
-
-
-    booking.cancel();
-
-    if (booking.getStatus() == BookingStatus.CANCELLED) {
-      console.log("Your booking is cancelled. \n ");
-
-      this.addSeatsAvailability(booking.getDate(), booking.getTimeSlot(), booking.getnumOfSeat());
-    }
-
-    console.log("Your booking cancelation failed due to some issue.\n ");
-    return;
-  }
-
-  rescheduleSeat(customerId: string, bookingId: string, newDate: string, newnumOfSeat: number, newTimeSlot: string) {
-    const customer = this.getCustomer(customerId);
-
-    const booking = customer.getBooking(bookingId);
-
-    const oldDate = booking.getDate()
-    const oldTimeSlot = booking.getTimeSlot()
-    const oldNumPerson = booking.getnumOfSeat()
-
-    if (booking.getStatus() == BookingStatus.CANCELLED) {
-      console.log("Cancelled booking can not be rescheduled.\n");
-      return;
-    }
-
-    const isSameDateTime = booking.checkSameDateAndTime(newDate, newTimeSlot);
-
-    if (isSameDateTime) {
-      this.addSeatsAvailability(newDate, newTimeSlot, booking.getnumOfSeat());
-    }
-
-    if (this.isSeatsAvailable(newDate, newTimeSlot, newnumOfSeat)) {
-      booking.reschedule(newDate, newnumOfSeat, newTimeSlot);
-
-      if (booking.getStatus() == BookingStatus.RESCHEDULE) {
-        this.removeSeatsAvailability(newDate, newTimeSlot, newnumOfSeat);
-
-        if (!isSameDateTime) {
-          this.addSeatsAvailability(oldDate, oldTimeSlot, oldNumPerson)
-        }
-
-      }
-
-      console.log(`Rescheduled booking:`, booking);
-      return;
-    }
-
-    if (isSameDateTime) {
-      this.removeSeatsAvailability(newDate, newTimeSlot, booking.getnumOfSeat());
-    }
-
-    console.log('Reschedule is failed.\n');
-
   }
 
   viewCustomersBookings(): void {
