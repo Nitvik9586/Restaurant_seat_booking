@@ -1,5 +1,3 @@
-import { Booking, BookingStatus } from "./booking";
-import { Customer } from "./customer";
 import { TimeSlot } from "./timeSlot";
 
 export type SeatAvaibility = {
@@ -12,12 +10,15 @@ type TimeSlotCapacity = {
 
 export class Restaurant {
 
-
   constructor(
-    private totalSeat: number = 0,
+    private id: string,
+    private name: string,
+    private address: string,
+    private totalSeats: number = 0,
     private seatsAvaibility: SeatAvaibility = {},
     private timeSlot = new TimeSlot(),
-    private customers: Customer[] = []
+    private pricePerSeat = 0,
+    private cancelFeeRate = 0
   ) {
 
     const start = new Date();
@@ -34,10 +35,22 @@ export class Restaurant {
     for (let i = 0; i < dates.length; i++) {
       const timeSlotCapacity: TimeSlotCapacity = {};
       for (let j = 0; j < this.timeSlot.getTimeSlots().length; j++) {
-        timeSlotCapacity[this.timeSlot.getTimeSlots()[j]] = this.totalSeat;
+        timeSlotCapacity[this.timeSlot.getTimeSlots()[j]] = this.totalSeats;
       }
       this.seatsAvaibility[dates[i]] = timeSlotCapacity;
     }
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getPricePerSeat(): number {
+    return this.pricePerSeat;
+  }
+
+  getCancelFeeRate(): number {
+    return this.cancelFeeRate;
   }
 
   getSeatAvailability(): SeatAvaibility {
@@ -56,18 +69,19 @@ export class Restaurant {
     return false;
   }
 
-  showAvailableTimeSlots(date: string, numOfSeat: number) {
-    let availableTimeSlot: TimeSlotCapacity = {};
+  showAvailableTimeSlots(date: string, numOfSeat: number): TimeSlotCapacity {
+    let availableTimeSlots: TimeSlotCapacity = {};
 
     for (let i = 0; i < this.timeSlot.getTimeSlots().length; i++) {
       const timeSlot = this.timeSlot.getTimeSlots()[i];
 
       if (this.seatsAvaibility[date][timeSlot] >= numOfSeat) {
-        availableTimeSlot[timeSlot] = this.seatsAvaibility[date][timeSlot];
+        availableTimeSlots[timeSlot] = this.seatsAvaibility[date][timeSlot];
       }
     }
 
-    console.log(`Available slots for ${date} : `, availableTimeSlot, '\n');
+    console.log(`Available slots for ${date} : `, availableTimeSlots, '\n');
+    return availableTimeSlots;
   }
 
   addSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
@@ -77,28 +91,4 @@ export class Restaurant {
   removeSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
-
-  registerCustomer(cutomerId: string, name: string, contactNum: string, email: string) {
-    if (this.getCustomer(cutomerId)) {
-      return;
-    }
-
-    const customer = new Customer(cutomerId, name, contactNum, email);
-    this.customers.push(customer);
-  }
-
-  getCustomer(customerId: string): Customer {
-    const customer = this.customers.find(customer => customer.getId() == customerId);
-    return customer as Customer;
-  }
-
-  viewCustomersBookings(): void {
-    this.customers.forEach(customer => {
-      console.log(`ID: ${customer.getId()} \nName: ${customer.getName()}`);
-
-      customer.viewBookings()
-    })
-  }
 }
-
-

@@ -1,17 +1,26 @@
+import { CreditCard } from "./creditCard";
+
 export enum PaymentStatus {
     PENDING = "PENDING",
     PAID = "PAID",
     REFUNDED = "REFUNDED",
 }
 
+export enum PaymentType {
+    UPI = 'UPI',
+    CREDITCARD = 'CreditCard',
+    DEBITCARD = 'DebitCard'
+}
+
 
 export class Payment {
     constructor(
-        private amount: number = 0,
-        private status: PaymentStatus = PaymentStatus.PENDING
+        public paymentType: PaymentType,
+        public amount: number = 0,
+        public status: PaymentStatus = PaymentStatus.PENDING,
     ) { }
 
-    public process(amount: number): boolean {
+    public process(amount: number) {
         const isPaid = this.payAmount()
         if (isPaid) {
             console.log(`Payment of ${amount} is paid.\n`)
@@ -30,7 +39,7 @@ export class Payment {
     }
 
     public refund(refundAmount: number): void {
-        console.log(`\nRefund of ${refundAmount} is refunded.`);
+        console.log(`\nRefund of ${refundAmount} is refunded. `);
         this.status = PaymentStatus.REFUNDED;
     }
 
