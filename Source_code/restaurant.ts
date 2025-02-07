@@ -65,13 +65,13 @@ export class Restaurant {
 
     for (let i = 0; i < this.timeSlot.getTimeSlots().length; i++) {
       const timeSlot = this.timeSlot.getTimeSlots()[i];
-      
-      if (this.seatsAvaibility[date][timeSlot] >= numOfSeat) {
-          availableTimeSlot[timeSlot] = this.seatsAvaibility[date][timeSlot];
-      }
-  }
 
-    console.log(`Available slots for ${date} : `, availableTimeSlot,'\n');
+      if (this.seatsAvaibility[date][timeSlot] >= numOfSeat) {
+        availableTimeSlot[timeSlot] = this.seatsAvaibility[date][timeSlot];
+      }
+    }
+
+    console.log(`Available slots for ${date} : `, availableTimeSlot, '\n');
   }
 
   addSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
@@ -130,7 +130,7 @@ export class Restaurant {
   cancleSeat(customerId: string, bookingId: string): void {
     const customer = this.getCustomer(customerId);
 
-    const booking = customer.getBookingById(bookingId);
+    const booking = customer.getBooking(bookingId);
 
 
     booking.cancel();
@@ -148,7 +148,7 @@ export class Restaurant {
   rescheduleSeat(customerId: string, bookingId: string, newDate: string, newnumOfSeat: number, newTimeSlot: string) {
     const customer = this.getCustomer(customerId);
 
-    const booking = customer.getBookingById(bookingId);
+    const booking = customer.getBooking(bookingId);
 
     const oldDate = booking.getDate()
     const oldTimeSlot = booking.getTimeSlot()
@@ -191,8 +191,9 @@ export class Restaurant {
 
   viewCustomersBookings(): void {
     this.customers.forEach(customer => {
-      console.log(customer);
-      // customer.viewBookings()
+      console.log(`ID: ${customer.getId()} \nName: ${customer.getName()}`);
+
+      customer.viewBookings()
     })
   }
 }

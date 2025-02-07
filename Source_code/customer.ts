@@ -20,16 +20,13 @@ export class Customer {
     // console.log('new Booking is added to history.')
   }
 
-  public getBookingById(bookingId: string): Booking {
+  public getBooking(bookingId: string): Booking {
     return this.bookingHistory.find(booking => booking.getId() == bookingId) as Booking
   }
 
   public viewBookings(): void {
-    console.log(`Bookigs of ${this.name}\n `);
-
     this.bookingHistory.forEach(booking => {
       console.log(booking);
-
     });
   }
 }
