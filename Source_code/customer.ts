@@ -1,5 +1,5 @@
 import { Booking, BookingStatus } from "./booking";
-import { PaymentType } from "./payment";
+import { Payment, PaymentType } from "./payment";
 import { Restaurant } from "./restaurant";
 
 export class Customer {
@@ -38,7 +38,7 @@ export class Customer {
     return `b${++this.bookingCount}`;
   }
 
-  bookSeat(restaurant: Restaurant, date: string, timeSlot: string, numOfSeat: number, paymentType: PaymentType): void {
+  bookSeat(restaurant: Restaurant, date: string, timeSlot: string, numOfSeat: number, payment: Payment): void {
 
     if (restaurant.isSeatsAvailable(date, timeSlot, numOfSeat)) {
 
@@ -46,9 +46,13 @@ export class Customer {
 
       const bookingId = this.generateBookingId();
 
-      const booking = new Booking(this.id,restaurant.getId(),bookingId, date, numOfSeat, timeSlot)
+      const paymentAmount = numOfSeat * restaurant.getPricePerSeat()
+      payment.setAmount(paymentAmount)
 
-      booking.confirm(restaurant, paymentType);
+      const booking = new Booking(this.id,restaurant.getId(),bookingId, date, numOfSeat, timeSlot,payment)
+
+      booking.confirm(restaurant, payment);
+      
 
       if (booking.getStatus() == BookingStatus.CONFIRMED) {
         this.addBooking(booking);
@@ -72,6 +76,6 @@ export class Customer {
     const booking = this.getBooking(bookingId);
 
     booking.reschedule(restaurant,newDate, newnumOfSeat, newTimeSlot);
-    console.log(`Rescheduled booking:`, booking);  
+    // console.log(`Rescheduled booking:`, booking);  
   }
 }

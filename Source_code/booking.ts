@@ -17,8 +17,8 @@ export class Booking {
     private date: string,
     private numOfSeat: number,
     private timeSlot: string,
+    private payment: Payment,
     private status: BookingStatus = BookingStatus.PENDING,
-    private payment: Payment = new Payment(PaymentType.UPI)
   ) {
   }
 
@@ -31,22 +31,26 @@ export class Booking {
   }
 
 
-  public confirm(restaurant: Restaurant, paymentType: PaymentType): void {
-    console.log(`Proceed to pay ${this.payment.getAmount()}...\n`)
+  public confirm(restaurant: Restaurant, payment: Payment): void {
+    
+    console.log(`Proceed to pay ${payment.getAmount()}...\n`)
+    
 
-    this.payment.process(this.payment.getAmount());
+    payment.process(payment.getAmount());
+    
 
-    if (this.payment.getStatus() == PaymentStatus.PAID) {
+    if (payment.getStatus() == PaymentStatus.PAID) {
       this.status = BookingStatus.CONFIRMED;
 
-      console.log(`Your booking is confirmed and Booking ID is ${this.id}.\n`);
+      console.log(`Your booking is confirmed and Booking ID is ${this.id}.\n
+===============================================================\n`);
 
       restaurant.removeSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
       return;
     }
 
     console.log(`Booking can not be done due to failed payment.\n
-      ================================================================\n`);
+================================================================\n`);
     return;
   }
 
@@ -117,7 +121,8 @@ export class Booking {
       this.payment.setAmount(totalAmount);
       this.status = BookingStatus.RESCHEDULE;
 
-      console.log(`Your booking is Reschedulled.\n==========================================\n`);
+      console.log(`Your booking is Reschedulled.\n
+==========================================\n`);
       return;
     }
 

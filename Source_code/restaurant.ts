@@ -15,9 +15,9 @@ export class Restaurant {
     private name: string,
     private address: string,
     private totalSeats: number = 0,
+    private pricePerSeat:number ,
     private seatsAvaibility: SeatAvaibility = {},
     private timeSlot = new TimeSlot(),
-    private pricePerSeat = 0,
     private cancelFeeRate = 0
   ) {
 
@@ -65,7 +65,8 @@ export class Restaurant {
       console.log(`${numOfSeat} seats is available for date ${date} and time slot ${timeSlot}.\n`);
       return true;
     }
-    console.log(`Required seats ${numOfSeat} is not available for date ${date} and time slot ${timeSlot}.\n`);
+    console.log(`Required seats ${numOfSeat} is not available for date ${date} and time slot ${timeSlot}.\n
+============================================\n`);
     return false;
   }
 

@@ -1,6 +1,9 @@
+import { CreditCard } from "./creditCard";
 import { Customer } from "./customer";
-import { PaymentType } from "./payment";
+import { DebitCard } from "./debitcard";
+import { Payment, PaymentType } from "./payment";
 import { Restaurant } from "./restaurant";
+import { Upi } from "./upi";
 
 class Simulator {
 
@@ -24,11 +27,11 @@ class Simulator {
         return customer as Customer;
     }
     
-    addRestaurant(restaurantId: string,name: string,address: string,totalSeat: number): void {
+    addRestaurant(restaurantId: string,name: string,address: string,totalSeat: number,pricePerSeat:number): void {
         if (this.getRestaurant(restaurantId)) {
             return;
         }
-        this.restaurants.push( new Restaurant(restaurantId,name,address,totalSeat));
+        this.restaurants.push( new Restaurant(restaurantId,name,address,totalSeat,pricePerSeat));
     }
 
     getRestaurant(restaurantId:string): Restaurant {
@@ -37,12 +40,15 @@ class Simulator {
         return restaurant as Restaurant;
     }
 
-    simulateBooking(customerId: string,restaurantId: string, bookingDate: string, numOfSeat: number, timeSlot: string, paymentType: PaymentType) {
+    simulateBooking(customerId: string, restaurantId: string, bookingDate: string, numOfSeat: number, timeSlot: string, payment: Payment, p0: void) {
         const customer = this.getCustomer(customerId);
 
         const restaurant = this.getRestaurant(restaurantId);
+        // const payment = new Payment(paymentType,numOfSeat)
+        // let payment:Payment;        
 
-        customer.bookSeat(restaurant, bookingDate, timeSlot, numOfSeat, paymentType);
+        customer.bookSeat(restaurant, bookingDate, timeSlot, numOfSeat, payment);
+        
     }
 
     simulateCancel(customerId: string,restaurantId:string, bookingId: string) {
@@ -64,23 +70,31 @@ class Simulator {
         customer.viewBookings();
     }
 
-
+    simulateViewAllBooking(){
+        console.log(this.customers);
+        
+    }
 
 }
 
-// const s1 = new Simulator();
-// s1.setRestaurant(30)
-// s1.getRestaurant().registerCustomer('c1', "nitvik", "9586764635", "nitvik@gmail.com");
+const s1 = new Simulator();
+s1.addRestaurant("R1","Jp","xxxxx",30,10);
+s1.addRestaurant("R2","Jp1","yyyyyyy",40,100);
+s1.addCustomer('c1', "jayraj", "9738587203", "jayraj@gmail.com");
+s1.addCustomer('c2', "nitvik", "9586764635", "nitvik@gmail.com");
 // s1.getRestaurant().registerCustomer('c2', "jayraj", "9738587203", "jayraj@gmail.com");
 // s1.getRestaurant().getSeatAvailability()
-// s1.simulateBooking('c1', "2025-02-12", 10, "1 P.M.");
+s1.simulateBooking('c1',"R1", "2025-02-12", 10, "1 P.M.",new Upi("U56"));
+s1.simulateBooking('c1',"R2", "2025-02-12", 20, "1 P.M.",new CreditCard(56));
+s1.simulateBooking('c2',"R1", "2025-02-12", 3, "1 P.M.",new DebitCard(555));
+// s1.simulateBooking('c1',"R1", "2025-02-12", 1, "1 P.M.",PaymentType.UPI);
 // s1.simulateBooking('c1', "2025-02-12", 10, "2 P.M.")
 // s1.simulateBooking('c2', "2025-02-12", 5, "1 P.M.")
 // s1.simulateBooking('c1', "2025-02-12", 10, "3 P.M.")
-// s1.simulateCancel("c1", "b1")
-// s1.simulateReschedule('c1', 'b1', "2025-02-12", 15, "1 P.M.")
-// s1.simulateViewBookings();
+// s1.simulateCancel("c1","R1","b1")
+s1.simulateReschedule('c1',"R1",'b1', "2025-02-12", 15, "2 P.M.")
+// s1.simulateViewBookings("c1");
 // s1.getRestaurant().showAvailableTimeSlots("2025-02-13",10);
-
+// s1.simulateViewAllBooking()
 // s1.simulateBooking("c2", "2025-02-12", 10, "1 P.M.")
 // s1.simulateBooking("c2", "2025-02-13", 5, "1 P.M.")
