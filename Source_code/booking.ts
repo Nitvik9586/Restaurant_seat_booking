@@ -1,3 +1,4 @@
+import { Customer } from "./customer";
 import { Payment, PaymentStatus, PaymentType } from "./payment";
 import { Restaurant } from "./restaurant";
 
@@ -13,11 +14,11 @@ export class Booking {
   constructor(
     private customerId: string,
     private restaurantId: string,
-    private id: string,
     private date: string,
     private numOfSeat: number,
     private timeSlot: string,
     private payment: Payment,
+    private id: string = '',
     private status: BookingStatus = BookingStatus.PENDING,
   ) {
   }
@@ -25,28 +26,42 @@ export class Booking {
   public getId(): string {
     return this.id
   }
-
-  public getStatus(): BookingStatus {
-    return this.status;
+  public getRestaurantId(): string {
+    return this.restaurantId;
   }
 
 
-  public confirm(restaurant: Restaurant, payment: Payment): void {
-    
-    console.log(`Proceed to pay ${payment.getAmount()}...\n`)
-    
+  public confirm(customer: Customer, restaurant: Restaurant): void {
 
-    payment.process(payment.getAmount());
-    
+    if (restaurant.isSeatsAvailable(this.date, this.timeSlot, this.numOfSeat)) {
 
-    if (payment.getStatus() == PaymentStatus.PAID) {
-      this.status = BookingStatus.CONFIRMED;
+      console.log(`Booking started by ${customer.getName()}...\n`);
 
-      console.log(`Your booking is confirmed and Booking ID is ${this.id}.\n
+      const paymentAmount = this.numOfSeat * restaurant.getPricePerSeat()
+      this.payment.setAmount(paymentAmount)
+
+      console.log(`Proceed to pay ${this.payment.getAmount()}...\n`)
+
+
+      this.payment.process(this.payment.getAmount());
+
+
+      if (this.payment.getStatus() == PaymentStatus.PAID) {
+        this.id = customer.generateBookingId();
+        this.status = BookingStatus.CONFIRMED;
+
+        customer.addBooking(this);
+
+        restaurant.removeSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
+
+        console.log(`Your booking is confirmed with Booking ID ${this.id} in ${restaurant.getName()} restaurant.\n
 ===============================================================\n`);
 
-      restaurant.removeSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
+        return;
+      }
+      console.log('Your booking is not confirmed.');
       return;
+
     }
 
     console.log(`Booking can not be done due to failed payment.\n

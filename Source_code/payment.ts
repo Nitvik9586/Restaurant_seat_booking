@@ -15,23 +15,20 @@ export enum PaymentType {
 
 export abstract class Payment {
     constructor(
-        protected amount: number = 0,
+        protected amount: number,
         protected paymentType: PaymentType,
-        protected status: PaymentStatus = PaymentStatus.PENDING
+        protected status: PaymentStatus
     ) { }
 
-    public abstract process(amount: number):boolean;
+    public abstract process(amount: number): boolean;
+
+    public abstract refund(refundAmount: number): void;
 
     protected payAmount(): boolean {
         const paid = [false, true];
 
         let i = Math.random() < 0.9 ? 1 : 0;
         return paid[1]
-    }
-
-    public refund(refundAmount: number): void {
-        console.log(`\nRefund of ${refundAmount} is refunded. `);
-        this.status = PaymentStatus.REFUNDED;
     }
 
     public getAmount(): number {
@@ -51,3 +48,4 @@ export abstract class Payment {
         this.status = status;
     }
 }
+

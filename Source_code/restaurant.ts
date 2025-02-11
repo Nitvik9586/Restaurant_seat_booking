@@ -16,9 +16,9 @@ export class Restaurant {
     private address: string,
     private totalSeats: number = 0,
     private pricePerSeat:number ,
+    private cancelFeeRate :number = 0,
     private seatsAvaibility: SeatAvaibility = {},
     private timeSlot = new TimeSlot(),
-    private cancelFeeRate = 0
   ) {
 
     const start = new Date();
@@ -53,10 +53,13 @@ export class Restaurant {
     return this.cancelFeeRate;
   }
 
+  getName():string{
+    return this.name
+  }
+
   getSeatAvailability(): SeatAvaibility {
     console.log(this.seatsAvaibility);
     return this.seatsAvaibility;
-    ;
   }
 
   isSeatsAvailable(date: string, timeSlot: string, numOfSeat: number): boolean {
@@ -92,4 +95,6 @@ export class Restaurant {
   removeSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
+
+  
 }
