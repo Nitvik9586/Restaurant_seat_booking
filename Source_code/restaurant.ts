@@ -15,8 +15,8 @@ export class Restaurant {
     private name: string,
     private address: string,
     private totalSeats: number = 0,
-    private pricePerSeat:number ,
-    private cancelFeeRate :number = 0,
+    private pricePerSeat: number,
+    private cancelFeeRate: number = 0,
     private seatsAvaibility: SeatAvaibility = {},
     private timeSlot = new TimeSlot(),
   ) {
@@ -45,15 +45,8 @@ export class Restaurant {
     return this.id;
   }
 
-  getPricePerSeat(): number {
-    return this.pricePerSeat;
-  }
-
-  getCancelFeeRate(): number {
-    return this.cancelFeeRate;
-  }
-
-  getName():string{
+ 
+  getName(): string {
     return this.name
   }
 
@@ -71,6 +64,19 @@ export class Restaurant {
     console.log(`Required seats ${numOfSeat} is not available for date ${date} and time slot ${timeSlot}.\n
 ============================================\n`);
     return false;
+  }
+
+  getRefundAmount(numOfSeat: number): number {
+    const cancellationCharge = this.getTotalAmount(numOfSeat) * this.cancelFeeRate;
+    
+    console.log(`Cancelation charges is ${cancellationCharge}.`);
+
+    const refundAmount = this.getTotalAmount(numOfSeat) - cancellationCharge;
+    return refundAmount;
+  }
+
+  getTotalAmount(numOfSeats: number): number {
+    return numOfSeats * this.pricePerSeat;
   }
 
   showAvailableTimeSlots(date: string, numOfSeat: number): TimeSlotCapacity {
@@ -96,5 +102,5 @@ export class Restaurant {
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
 
-  
+
 }

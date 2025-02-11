@@ -1,3 +1,4 @@
+import { CreditCard } from "./creditCard";
 import { Customer } from "./customer";
 import { Payment, PaymentStatus, PaymentType } from "./payment";
 import { Restaurant } from "./restaurant";
@@ -10,10 +11,11 @@ export enum BookingStatus {
 }
 
 export class Booking {
+  static bookingCount: number = 0;
 
   constructor(
-    private customerId: string,
-    private restaurantId: string,
+    private customer: Customer,
+    private restaurant: Restaurant,
     private date: string,
     private numOfSeat: number,
     private timeSlot: string,
@@ -26,35 +28,31 @@ export class Booking {
   public getId(): string {
     return this.id
   }
-  public getRestaurantId(): string {
-    return this.restaurantId;
+
+  public generateBookingId(): string {
+    return `b${++Booking.bookingCount}`;
   }
 
 
-  public confirm(customer: Customer, restaurant: Restaurant): void {
+  public confirm(): void {
 
-    if (restaurant.isSeatsAvailable(this.date, this.timeSlot, this.numOfSeat)) {
+    if (this.restaurant.isSeatsAvailable(this.date, this.timeSlot, this.numOfSeat)) {
 
-      console.log(`Booking started by ${customer.getName()}...\n`);
+      console.log(`Booking started by ${this.customer.getName()}...\n`);
 
-      const paymentAmount = this.numOfSeat * restaurant.getPricePerSeat()
-      this.payment.setAmount(paymentAmount)
+      const paymentAmount = this.restaurant.getTotalAmount(this.numOfSeat);
 
-      console.log(`Proceed to pay ${this.payment.getAmount()}...\n`)
+      console.log(`Proceed to pay ${paymentAmount}...\n`)
 
-
-      this.payment.process(this.payment.getAmount());
-
-
-      if (this.payment.getStatus() == PaymentStatus.PAID) {
-        this.id = customer.generateBookingId();
+      if (this.payment.process(paymentAmount)) {
+        this.id = this.generateBookingId();
         this.status = BookingStatus.CONFIRMED;
 
-        customer.addBooking(this);
+        this.customer.addBooking(this);
 
-        restaurant.removeSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
+        this.restaurant.removeSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
 
-        console.log(`Your booking is confirmed with Booking ID ${this.id} in ${restaurant.getName()} restaurant.\n
+        console.log(`Your booking is confirmed with Booking ID ${this.id} in ${this.restaurant.getName()} restaurant.\n
 ===============================================================\n`);
 
         return;
@@ -69,22 +67,15 @@ export class Booking {
     return;
   }
 
-  public cancel(restaurant: Restaurant): void {
+  public cancel(): void {
+    const refundAmount = this.restaurant.getRefundAmount(this.numOfSeat);
 
-    const cancellationCharge = this.payment.getAmount() * restaurant.getCancelFeeRate();
-
-    const refundAmount = this.payment.getAmount() - cancellationCharge;
-
-    console.log(`Cancelation charges is ${cancellationCharge}.`);
-
-    this.payment.refund(refundAmount);
-
-    if (this.payment.getStatus() == PaymentStatus.REFUNDED) {
+    if (this.payment.refund(refundAmount)) {
       this.status = BookingStatus.CANCELLED;
 
-      console.log("Your booking is cancelled. \n ");
+      this.restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
 
-      restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
+      console.log("Your booking is cancelled. \n ");
       return;
     }
 
@@ -92,7 +83,7 @@ export class Booking {
     return;
   }
 
-  public reschedule(restaurant: Restaurant, newDate: string, newnumOfSeat: number, newTimeSlot: string): void {
+  public reschedule(newDate: string, newnumOfSeat: number, newTimeSlot: string): void {
 
     if (this.status == BookingStatus.CANCELLED) {
       console.log("Cancelled booking can not be rescheduled.\n");
@@ -102,38 +93,31 @@ export class Booking {
     const isSameDateTime = (this.date == newDate && this.timeSlot == newTimeSlot) ? true : false;
 
     if (isSameDateTime) {
-      restaurant.addSeatsAvailability(newDate, newTimeSlot, this.numOfSeat);
+      this.restaurant.addSeatsAvailability(newDate, newTimeSlot, this.numOfSeat);
     }
 
-    if (restaurant.isSeatsAvailable(newDate, newTimeSlot, newnumOfSeat)) {
+    if (this.restaurant.isSeatsAvailable(newDate, newTimeSlot, newnumOfSeat)) {
       const seatsToReschedule = newnumOfSeat - this.numOfSeat;
-      const diffInAmount = (seatsToReschedule) * restaurant.getPricePerSeat();
-
-      let totalAmount = this.payment.getAmount();
+      const diffInAmount = this.restaurant.getTotalAmount(seatsToReschedule)
 
       if (seatsToReschedule > 0) {
         const isPaymentDone = this.payment.process(diffInAmount);
 
         if (!isPaymentDone) return;
 
-        totalAmount = newnumOfSeat * restaurant.getPricePerSeat();
       } else if (seatsToReschedule < 0) {
-        this.payment.refund(-diffInAmount);
-
-        totalAmount = this.payment.getAmount() + diffInAmount;
-        this.payment.setStatus(PaymentStatus.PAID);
+        this.payment.update(-diffInAmount)
       }
 
-      restaurant.removeSeatsAvailability(newDate, newTimeSlot, newnumOfSeat);
+      this.restaurant.removeSeatsAvailability(newDate, newTimeSlot, newnumOfSeat);
 
       if (!isSameDateTime) {
-        restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat)
+        this.restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat)
       }
 
       this.date = newDate;
       this.numOfSeat = newnumOfSeat;
       this.timeSlot = newTimeSlot;
-      this.payment.setAmount(totalAmount);
       this.status = BookingStatus.RESCHEDULE;
 
       console.log(`Your booking is Reschedulled.\n
@@ -142,9 +126,9 @@ export class Booking {
     }
 
     if (isSameDateTime) {
-      restaurant.removeSeatsAvailability(newDate, newTimeSlot, this.numOfSeat);
+      this.restaurant.removeSeatsAvailability(newDate, newTimeSlot, this.numOfSeat);
     }
 
-    console.log('Reschedule is failed.\n Please re-try.');
+    console.log('Reschedule is failed.\nPlease re-try.');
   }
 }

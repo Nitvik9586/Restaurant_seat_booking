@@ -8,7 +8,6 @@ export class Customer {
     private name: string,
     private contactNum: string,
     private email: string,
-    private bookingCount: number = 0,
     private bookingHistory: Booking[] = []) { }
 
   public getId() {
@@ -38,8 +37,6 @@ export class Customer {
     return this.bookingHistory;
   }
 
-  public generateBookingId(): string {
-    return `b${++this.bookingCount}`;
-  }
+  
 
 }

@@ -1,12 +1,16 @@
 import { Payment, PaymentStatus, PaymentType } from "./payment";
 
-export class Upi extends Payment {
-    constructor(public upiId: string, amount: number = 0, paymentType: PaymentType = PaymentType.UPI, status: PaymentStatus = PaymentStatus.PENDING) {
-        super(amount, paymentType, status)
-    }
+export class Upi implements Payment {
+    constructor(
+        public upiId: string,
+        public amount: number = 0,
+        public paymentType: PaymentType = PaymentType.UPI,
+        public status: PaymentStatus = PaymentStatus.PENDING
+    ) {}
 
     public process(amount: number): boolean {
-        const isPaid = super.payAmount();
+        const isPaid = Math.random() < 0.9;
+        
         if (isPaid) {
             console.log(`Payment of ${amount} is paid by this UPI ID ${this.upiId}.\n`)
             this.status = PaymentStatus.PAID;
@@ -16,9 +20,16 @@ export class Upi extends Payment {
         return isPaid;
     }
 
-    public refund(refundAmount: number): void {
+    public refund(refundAmount: number): boolean {
         console.log(`\nRefund of ${refundAmount} is refunded to UPI ID ${this.upiId}.\n`);
         this.status = PaymentStatus.REFUNDED;
+        return true;
+    }
+
+    public update(amount: number): void {
+        this.refund(amount)
+        this.status = PaymentStatus.PAID;
+        this.amount -= amount;
     }
 
 }

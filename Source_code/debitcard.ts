@@ -1,17 +1,17 @@
 import { Payment, PaymentStatus, PaymentType } from "./payment";
 
-export class DebitCard extends Payment {
+export class DebitCard implements Payment {
     constructor(
         public debitCardNum: number,
-        amount: number = 0,
-        paymentType: PaymentType = PaymentType.DEBITCARD,
-        status: PaymentStatus = PaymentStatus.PENDING
+        public amount: number = 0,
+        public paymentType: PaymentType = PaymentType.DEBITCARD,
+        public status: PaymentStatus = PaymentStatus.PENDING
     ) {
-        super(amount, paymentType, status)
     }
 
     public process(amount: number): boolean {
-        const isPaid = super.payAmount();
+        const isPaid = Math.random() < 0.9;
+        
         if (isPaid) {
             console.log(`Payment of ${amount} is paid by this debit card NO. ${this.debitCardNum}.\n`)
             this.status = PaymentStatus.PAID;
@@ -21,9 +21,16 @@ export class DebitCard extends Payment {
         return isPaid;
     }
 
-    public refund(refundAmount: number): void {
+    public refund(refundAmount: number): boolean {
         console.log(`\nRefund of ${refundAmount} is refunded to debit card NO. ${this.debitCardNum}.\n`);
         this.status = PaymentStatus.REFUNDED;
+        return true;
+    }
+
+    public update(amount: number): void {
+        this.refund(amount)
+        this.status = PaymentStatus.PAID;
+        this.amount -= amount;
     }
 
 }
