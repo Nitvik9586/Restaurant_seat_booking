@@ -1,18 +1,17 @@
-import { Booking } from "./booking";
-import { CreditCard } from "./creditCard";
-import { Customer } from "./customer";
-import { DebitCard } from "./debitcard";
-import { Payment, PaymentType } from "./payment";
 import { Restaurant } from "./restaurant";
-import { Upi } from "./upi";
+import { Customer } from "./customer";
+import { Booking } from "./booking";
+import { Payment } from "./payment";
+import { CreditCardPayment } from "./creditCard";
+import { DebitCardPayment } from "./debitcard";
+import { UPIPayment } from "./upi";
 
 class Simulator {
 
     constructor(
         private restaurants: Restaurant[] = [],
         private customers: Customer[] = []
-    ) {
-    }
+    ) { }
 
     addCustomer(cutomerId: string, name: string, contactNum: string, email: string): void {
         if (this.getCustomer(cutomerId)) {
@@ -24,7 +23,7 @@ class Simulator {
     }
 
     getCustomer(customerId: string): Customer {
-        const customer = this.customers.find(customer => customer.getId() == customerId);
+        const customer = this.customers.find(customer => customer.id == customerId);
         return customer as Customer;
     }
 
@@ -37,11 +36,11 @@ class Simulator {
 
     getRestaurant(restaurantId: string): Restaurant {
 
-        const restaurant = this.restaurants.find(restaurant => restaurant.getId() == restaurantId);
+        const restaurant = this.restaurants.find(restaurant => restaurant.id == restaurantId);
         return restaurant as Restaurant;
     }
 
-    simulateBooking(customerId: string, restaurantId: string, bookingDate: string, numOfSeat: number, timeSlot: string, payment: Payment) {
+    simulateBooking(customerId: string, restaurantId: string, bookingDate: string, numOfSeat: number, timeSlot: string, payment: Payment): void {
         const customer = this.getCustomer(customerId);
 
         const restaurant = this.getRestaurant(restaurantId);
@@ -49,7 +48,7 @@ class Simulator {
         new Booking(customer, restaurant, bookingDate, numOfSeat, timeSlot, payment).confirm()
     }
 
-    simulateCancel(customerId: string, bookingId: string) {
+    simulateCancel(customerId: string, bookingId: string): void {
         const customer = this.getCustomer(customerId)
 
         const booking = customer.getBooking(bookingId);
@@ -57,51 +56,59 @@ class Simulator {
         booking.cancel();
     }
 
-    simulateReschedule(customerId: string,bookingId: string, newDate: string, newnumOfSeat: number, newTimeSlot: string) {
+    simulateReschedule(customerId: string, bookingId: string, newDate: string, newnumOfSeat: number, newTimeSlot: string): void {
         const customer = this.getCustomer(customerId)
 
         const booking = customer.getBooking(bookingId);
-        
+
 
         booking.reschedule(newDate, newnumOfSeat, newTimeSlot);
     }
 
-    simulateViewBookings(customerId: string): void {
-        const customer = this.getCustomer(customerId);
-        customer.viewBookings();
+    simulateViewCustomersBooking(customerId: string): void {
+        this.getCustomer(customerId).showBookings();
     }
 
-    simulateViewAllBooking() {
-        console.log(this.customers);
+    simulateViewRestaurantsBooking(restaurantId: string): void {
+        const bookings: string[] = []
+        this.customers.forEach(customer => {
+            const matchedBookings = customer.getBookings().filter(booking => booking.restaurant.id == restaurantId);
 
+            matchedBookings.forEach(booking => {
+                bookings.push(`
+    Customer: ${customer.name}${booking.getDetails()}`)
+            });
+        });
+
+        if (bookings.length > 0) {
+            console.log(`Bookings of ${this.getRestaurant(restaurantId).name}\n`)
+            bookings.forEach(booking => {
+                const index = bookings.indexOf(booking);
+                console.log(`Booking ${index + 1}: ${booking}`)
+            });
+            return;
+        }
+
+        console.log(`${this.getRestaurant(restaurantId).name} has no bookings.`);
     }
 
-    // simulateViewBookingOfRestaurant(restaurantId: string) {
-    //     let restaurantBookings: Booking[] = []
-    //     this.customers.forEach(customer => {
-    //         console.log(restaurantBookings, customer.getBookings().filter(booking => booking.getRestaurantId() == restaurantId))
-    //     })
-    // }
 }
 
 const s1 = new Simulator();
-s1.addRestaurant("R1", "Jp", "xxxxx", 30, 10, 0.10);
-s1.addRestaurant("R2", "Jp1", "yyyyyyy", 40, 20, 0.2);
-s1.addCustomer('c1', "jayraj", "9738587203", "jayraj@gmail.com");
-s1.addCustomer('c2', "nitvik", "9586764635", "nitvik@gmail.com");
-// s1.getRestaurant().registerCustomer('c2', "jayraj", "9738587203", "jayraj@gmail.com");
-// s1.getRestaurant().getSeatAvailability()
-s1.simulateBooking('c1', "R1", "2025-02-15", 10, "1 P.M.", new CreditCard(56));
-s1.simulateBooking('c1', "R2", "2025-02-15", 20, "1 P.M.", new CreditCard(56));
-s1.simulateBooking('c2', "R1", "2025-02-15", 3, "1 P.M.", new CreditCard(56));
-// s1.simulateBooking('c1',"R1", "2025-02-12", 1, "1 P.M.",PaymentType.UPI);
-// s1.simulateBooking('c1', "2025-02-12", 10, "2 P.M.")
-// s1.simulateBooking('c2', "2025-02-12", 5, "1 P.M.")
-// s1.simulateBooking('c1', "2025-02-12", 10, "3 P.M.")
-s1.simulateCancel("c1","b1")
-// s1.simulateReschedule('c1', 'b1', "2025-02-17", 1, "2 P.M.")
-// s1.simulateViewBookings("c1");
-// s1.getRestaurant().showAvailableTimeSlots("2025-02-13",10);
-// s1.simulateViewAllBooking()
-// s1.simulateBooking("c2", "2025-02-12", 10, "1 P.M.")
-// s1.simulateBooking("c2", "2025-02-13", 5, "1 P.M.")
+
+s1.addRestaurant("R1", "Food Zone", "012, Ground floor, Alpha mall, Ahmedabad - 380005", 30, 10, 0.10);
+s1.addRestaurant("R2", "Food Station", "115, first floor, Reliance mall, Ahmedabad - 380005", 40, 20, 0.20);
+
+s1.addCustomer('C1', "Nitvik", "9586764635", "nitvik@gmail.com");
+s1.addCustomer('C2', "Jayraj", "9738587203", "jayraj@gmail.com");
+
+s1.simulateBooking('C1', "R1", "2025-02-15", 10, "1 P.M.", new UPIPayment('9586764635@ptyes'));
+s1.simulateBooking('C1', "R2", "2025-02-16", 5, "2 P.M.", new CreditCardPayment('4568-7894-8945', '06/30', 897, 'Nitvik Gamit'));
+s1.simulateBooking('C2', "R1", "2025-02-15", 10, "3 P.M.", new UPIPayment('8469637980@apl'));
+s1.simulateBooking('C2', "R2", "2025-02-16", 15, "2 P.M.", new CreditCardPayment('8475-1254-4875', '08/32', 896, 'Jayraj Nakun'));
+
+s1.simulateViewCustomersBooking('C1')
+s1.simulateViewCustomersBooking('C2')
+
+s1.simulateViewRestaurantsBooking('R1')
+s1.simulateViewRestaurantsBooking('R2')

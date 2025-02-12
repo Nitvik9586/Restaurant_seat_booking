@@ -11,8 +11,8 @@ type TimeSlotCapacity = {
 export class Restaurant {
 
   constructor(
-    private id: string,
-    private name: string,
+    public readonly id: string,
+    public readonly name: string,
     private address: string,
     private totalSeats: number = 0,
     private pricePerSeat: number,
@@ -20,7 +20,6 @@ export class Restaurant {
     private seatsAvaibility: SeatAvaibility = {},
     private timeSlot = new TimeSlot(),
   ) {
-
     const start = new Date();
     const dates: string[] = [];
 
@@ -40,16 +39,7 @@ export class Restaurant {
       this.seatsAvaibility[dates[i]] = timeSlotCapacity;
     }
   }
-
-  getId(): string {
-    return this.id;
-  }
-
- 
-  getName(): string {
-    return this.name
-  }
-
+  
   getSeatAvailability(): SeatAvaibility {
     console.log(this.seatsAvaibility);
     return this.seatsAvaibility;
@@ -61,18 +51,16 @@ export class Restaurant {
       console.log(`${numOfSeat} seats is available for date ${date} and time slot ${timeSlot}.\n`);
       return true;
     }
-    console.log(`Required seats ${numOfSeat} is not available for date ${date} and time slot ${timeSlot}.\n
-============================================\n`);
+    console.log(`Required seats ${numOfSeat} is not available for date ${date} and time slot ${timeSlot}.\n`);
     return false;
   }
 
   getRefundAmount(numOfSeat: number): number {
     const cancellationCharge = this.getTotalAmount(numOfSeat) * this.cancelFeeRate;
     
-    console.log(`Cancelation charges is ${cancellationCharge}.`);
+    console.log(`Cancelation charges is ${cancellationCharge}.\n`);
 
-    const refundAmount = this.getTotalAmount(numOfSeat) - cancellationCharge;
-    return refundAmount;
+    return this.getTotalAmount(numOfSeat) - cancellationCharge;
   }
 
   getTotalAmount(numOfSeats: number): number {
@@ -101,6 +89,4 @@ export class Restaurant {
   removeSeatsAvailability(date: string, timeSlot: string, numOfSeat: number): void {
     this.seatsAvaibility[date][timeSlot] -= numOfSeat;
   }
-
-
 }

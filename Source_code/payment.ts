@@ -1,5 +1,3 @@
-import { CreditCard } from "./creditCard";
-
 export enum PaymentStatus {
     PENDING = "PENDING",
     PAID = "PAID",
@@ -8,10 +6,9 @@ export enum PaymentStatus {
 
 export enum PaymentType {
     UPI = 'UPI',
-    CREDITCARD = 'CreditCard',
-    DEBITCARD = 'DebitCard'
+    CREDITCARD =  "CreditCard",
+    DEBITCARD = "DebitCard"
 }
-
 
 export interface Payment {
     amount: number;

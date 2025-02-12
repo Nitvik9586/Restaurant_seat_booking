@@ -1,42 +1,40 @@
-import { Booking, BookingStatus } from "./booking";
-import { Payment, PaymentType } from "./payment";
-import { Restaurant } from "./restaurant";
+import { Booking } from "./booking";
 
 export class Customer {
-
-  constructor(private id: string,
-    private name: string,
+  constructor(
+    public readonly id: string,
+    public readonly name: string,
     private contactNum: string,
     private email: string,
-    private bookingHistory: Booking[] = []) { }
-
-  public getId() {
-    return this.id;
-  }
-
-  getName(): string {
-    return this.name;
-  }
+    private bookingHistory: Booking[] = []
+  ) { }
 
   public addBooking(booking: Booking): void {
     this.bookingHistory.push(booking);
-    // console.log('new Booking is added to history.')
   }
 
   public getBooking(bookingId: string): Booking {
     return this.bookingHistory.find(booking => booking.getId() == bookingId) as Booking
   }
 
-  public viewBookings(): void {
-    this.bookingHistory.forEach(booking => {
-      console.log(booking);
-    });
-  }
-
-  public getBookings(): Booking[]{
+  public getBookings(): Booking[] {
     return this.bookingHistory;
   }
 
-  
+  public showBookings(): void {
+    let bookings: string[] = [];
 
+    this.bookingHistory.forEach(booking => {
+      const index = this.bookingHistory.indexOf(booking);
+      bookings.push(`\nBooking ${index + 1}:
+    Restaurant: ${booking.restaurant.name}${booking.getDetails()}`)
+    });
+
+    if (bookings.length > 0) {
+      console.log(`${this.name}'s Bookings: \n ${bookings}`);
+      return;
+    }
+
+    console.log(`${this.name}'s booking history is empty`);
+  }
 }
