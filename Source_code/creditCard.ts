@@ -1,10 +1,10 @@
 import { Payment, PaymentStatus, PaymentType } from "./payment";
 
-export class CreditCard implements Payment{
-    constructor(public creditCardNum:number,
-        public amount:number=0,
-        public paymentType:PaymentType= PaymentType.CREDITCARD,
-        public status:PaymentStatus= PaymentStatus.PENDING){
+export class CreditCard implements Payment {
+    constructor(public creditCardNum: number,
+        public amount: number = 0,
+        public paymentType: PaymentType = PaymentType.CREDITCARD,
+        public status: PaymentStatus = PaymentStatus.PENDING) {
     }
 
     public process(amount: number): boolean {
@@ -21,15 +21,15 @@ export class CreditCard implements Payment{
     }
 
     public refund(refundAmount: number): boolean {
-        console.log(`\nRefund of ${refundAmount} is refunded to credit card NO. ${this.creditCardNum}.\n`);
+        
+        if (refundAmount < 0) {
+            console.log(`\nRefund of ${-refundAmount} is refunded to credit card NO. ${this.creditCardNum}.\n`);
+            this.amount += refundAmount;
+            return true;
+        }
+        console.log(`\nRefund of ${refundAmount} is refunded to credit card NO. ${this.creditCardNum}.\n`);        
         this.status = PaymentStatus.REFUNDED;
         return true;
     }
 
-    public update(amount:number):void{
-        this.refund(amount)
-        this.status = PaymentStatus.PAID;
-        this.amount -= amount; 
-    }
-    
 }

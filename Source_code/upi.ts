@@ -21,15 +21,14 @@ export class Upi implements Payment {
     }
 
     public refund(refundAmount: number): boolean {
-        console.log(`\nRefund of ${refundAmount} is refunded to UPI ID ${this.upiId}.\n`);
+        if (refundAmount < 0) {
+            console.log(`\nRefund of ${-refundAmount} is refunded to debit UPI ID ${this.upiId}.\n`);
+            this.amount += refundAmount;
+            return true;
+        }
+        console.log(`\nRefund of ${refundAmount} is refunded to debit UPI ID ${this.upiId}.\n`);        
         this.status = PaymentStatus.REFUNDED;
         return true;
-    }
-
-    public update(amount: number): void {
-        this.refund(amount)
-        this.status = PaymentStatus.PAID;
-        this.amount -= amount;
     }
 
 }

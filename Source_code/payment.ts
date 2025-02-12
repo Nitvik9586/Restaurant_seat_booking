@@ -20,5 +20,4 @@ export interface Payment {
     
     process(amount: number): boolean;
     refund(refundAmount: number): boolean;
-    update(amount: number): void;
 }

@@ -91,15 +91,15 @@ s1.addCustomer('c1', "jayraj", "9738587203", "jayraj@gmail.com");
 s1.addCustomer('c2', "nitvik", "9586764635", "nitvik@gmail.com");
 // s1.getRestaurant().registerCustomer('c2', "jayraj", "9738587203", "jayraj@gmail.com");
 // s1.getRestaurant().getSeatAvailability()
-s1.simulateBooking('c1', "R1", "2025-02-12", 10, "1 P.M.", new CreditCard(56));
-s1.simulateBooking('c1', "R2", "2025-02-12", 20, "1 P.M.", new CreditCard(56));
-s1.simulateBooking('c2', "R1", "2025-02-12", 3, "1 P.M.", new CreditCard(56));
+s1.simulateBooking('c1', "R1", "2025-02-15", 10, "1 P.M.", new CreditCard(56));
+s1.simulateBooking('c1', "R2", "2025-02-15", 20, "1 P.M.", new CreditCard(56));
+s1.simulateBooking('c2', "R1", "2025-02-15", 3, "1 P.M.", new CreditCard(56));
 // s1.simulateBooking('c1',"R1", "2025-02-12", 1, "1 P.M.",PaymentType.UPI);
 // s1.simulateBooking('c1', "2025-02-12", 10, "2 P.M.")
 // s1.simulateBooking('c2', "2025-02-12", 5, "1 P.M.")
 // s1.simulateBooking('c1', "2025-02-12", 10, "3 P.M.")
-// s1.simulateCancel("c1","b1")
-s1.simulateReschedule('c1', 'b1', "2025-02-12", 1, "2 P.M.")
+s1.simulateCancel("c1","b1")
+// s1.simulateReschedule('c1', 'b1', "2025-02-17", 1, "2 P.M.")
 // s1.simulateViewBookings("c1");
 // s1.getRestaurant().showAvailableTimeSlots("2025-02-13",10);
 // s1.simulateViewAllBooking()

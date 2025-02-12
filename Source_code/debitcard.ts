@@ -22,15 +22,13 @@ export class DebitCard implements Payment {
     }
 
     public refund(refundAmount: number): boolean {
-        console.log(`\nRefund of ${refundAmount} is refunded to debit card NO. ${this.debitCardNum}.\n`);
+        if (refundAmount < 0) {
+            console.log(`\nRefund of ${-refundAmount} is refunded to debit card NO. ${this.debitCardNum}.\n`);
+            this.amount += refundAmount;
+            return true;
+        }
+        console.log(`\nRefund of ${refundAmount} is refunded to debit card NO. ${this.debitCardNum}.\n`);        
         this.status = PaymentStatus.REFUNDED;
         return true;
     }
-
-    public update(amount: number): void {
-        this.refund(amount)
-        this.status = PaymentStatus.PAID;
-        this.amount -= amount;
-    }
-
 }

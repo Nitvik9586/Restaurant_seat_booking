@@ -76,6 +76,8 @@ export class Booking {
       this.restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
 
       console.log("Your booking is cancelled. \n ");
+      console.log(this);
+      
       return;
     }
 
@@ -106,7 +108,10 @@ export class Booking {
         if (!isPaymentDone) return;
 
       } else if (seatsToReschedule < 0) {
-        this.payment.update(-diffInAmount)
+        this.payment.refund(diffInAmount)
+        console.log(seatsToReschedule,"dddddddddddddddd");
+        
+        // this.payment.update(-diffInAmount)
       }
 
       this.restaurant.removeSeatsAvailability(newDate, newTimeSlot, newnumOfSeat);
@@ -122,6 +127,8 @@ export class Booking {
 
       console.log(`Your booking is Reschedulled.\n
 ==========================================\n`);
+// console.log(this);
+
       return;
     }
 
