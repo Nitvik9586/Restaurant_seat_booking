@@ -27,7 +27,8 @@ export class Customer {
     this.bookingHistory.forEach(booking => {
       const index = this.bookingHistory.indexOf(booking);
       bookings.push(`\nBooking ${index + 1}:
-    Restaurant: ${booking.restaurant.name}${booking.getDetails()}`)
+    Restaurant: ${booking.restaurant.name}
+    Addres: ${booking.restaurant.address}${booking.getDetails()}`)
     });
 
     if (bookings.length > 0) {

@@ -13,7 +13,7 @@ export class Restaurant {
   constructor(
     public readonly id: string,
     public readonly name: string,
-    private address: string,
+    public readonly address: string,
     private totalSeats: number = 0,
     private pricePerSeat: number,
     private cancelFeeRate: number = 0,
@@ -47,6 +47,9 @@ export class Restaurant {
 
   isSeatsAvailable(date: string, timeSlot: string, numOfSeat: number): boolean {
     const seatAvailability = this.seatsAvaibility[date][timeSlot];
+
+    console.log(`Checking availability...\n...\n...\n`);
+
     if (seatAvailability >= numOfSeat) {
       console.log(`${numOfSeat} seats is available for date ${date} and time slot ${timeSlot}.\n`);
       return true;
@@ -55,15 +58,16 @@ export class Restaurant {
     return false;
   }
 
-  getRefundAmount(numOfSeat: number): number {
-    const cancellationCharge = this.getTotalAmount(numOfSeat) * this.cancelFeeRate;
+  calculateRefundAmount(numOfSeat: number): number {
+    const cancellationCharge = this.calculateAmount(numOfSeat) * this.cancelFeeRate;
     
     console.log(`Cancelation charges is ${cancellationCharge}.\n`);
 
-    return this.getTotalAmount(numOfSeat) - cancellationCharge;
+    return this.calculateAmount(numOfSeat) - cancellationCharge;
   }
 
-  getTotalAmount(numOfSeats: number): number {
+  calculateAmount(numOfSeats: number): number {
+    console.log(`Total payable amount for ${numOfSeats} seat is ${numOfSeats * this.pricePerSeat}.\n`)
     return numOfSeats * this.pricePerSeat;
   }
 

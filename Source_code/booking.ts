@@ -37,12 +37,8 @@ export class Booking {
     console.log(`Selected timeslot: ${this.timeSlot}\n`);
     console.log(`Selected number of seats: ${this.numOfSeat}\n`);
 
-    console.log(`Checking availability...\n...\n...\n`);
-
     if (this.restaurant.isSeatsAvailable(this.date, this.timeSlot, this.numOfSeat)) {
-      const payableAmount = this.restaurant.getTotalAmount(this.numOfSeat);
-
-      console.log(`Total payable amount for ${this.numOfSeat} seat is ${payableAmount}.\n`)
+      const payableAmount = this.restaurant.calculateAmount(this.numOfSeat);
 
       console.log(`Proceed to pay ${payableAmount}...\n`)
 
@@ -72,7 +68,7 @@ export class Booking {
   public cancel(): void {
     console.log(`Cancellation started for booking having id ${this.id}\n`);
 
-    const refundAmount = this.restaurant.getRefundAmount(this.numOfSeat);
+    const refundAmount = this.restaurant.calculateRefundAmount(this.numOfSeat);
 
     if (this.payment.refund(refundAmount)) {
       this.restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
@@ -85,37 +81,50 @@ export class Booking {
     return;
   }
 
-  public reschedule(newDate: string, newnumOfSeat: number, newTimeSlot: string): void {
+  public reschedule(newDate: string, newNumOfSeat: number, newTimeSlot: string, newPaymentMethod?: Payment): void {
+    console.log('Reschedule started for selected booking...\n');
 
-    if (this.status == BookingStatus.CANCELLED) {
-      console.log("Cancelled booking can not be rescheduled.\n");
-      return;
-    }
+    if (this.status == BookingStatus.CANCELLED) return console.log("Cancelled booking can not be rescheduled.\n");
+
+    console.log(`New selected date: ${newDate}\n`);
+    console.log(`New selected timeslot: ${newTimeSlot}\n`);
+    console.log(`New selected number of seats: ${newNumOfSeat}\n`);
 
     const isSameDateTime = (this.date == newDate && this.timeSlot == newTimeSlot) ? true : false;
 
     if (isSameDateTime) {
-      this.restaurant.addSeatsAvailability(newDate, newTimeSlot, this.numOfSeat);
+      this.restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
     }
 
-    if (this.restaurant.isSeatsAvailable(newDate, newTimeSlot, newnumOfSeat)) {
-      const seatsToReschedule = newnumOfSeat - this.numOfSeat;
-      const diffInAmount = this.restaurant.getTotalAmount(seatsToReschedule)
+    if (this.restaurant.isSeatsAvailable(newDate, newTimeSlot, newNumOfSeat)) {
+      const seatDifference = newNumOfSeat - this.numOfSeat;
+      const amountDifference = this.restaurant.calculateAmount(seatDifference)
 
-      if (seatsToReschedule > 0) {
-        if (!this.payment.process(diffInAmount)) return;
-      } else if (seatsToReschedule < 0) {
-        this.payment.refund(diffInAmount)
+      if (seatDifference > 0) {
+        let oldPayment = this.payment;
+
+        if (newPaymentMethod && newPaymentMethod !== this.payment) {
+          this.payment = newPaymentMethod;
+          this.payment.amount = oldPayment.amount;
+        }
+
+        if (!this.payment.process(amountDifference)){
+          this.payment = oldPayment;
+          console.log('Reschedule failed due to payment failure.\n Please re-try.\n');
+          return;
+        } 
+      } else if (seatDifference < 0){
+        this.payment.refund(amountDifference)
       }
 
-      this.restaurant.removeSeatsAvailability(newDate, newTimeSlot, newnumOfSeat);
+      this.restaurant.removeSeatsAvailability(newDate, newTimeSlot, newNumOfSeat);
 
       if (!isSameDateTime) {
         this.restaurant.addSeatsAvailability(this.date, this.timeSlot, this.numOfSeat)
       }
 
       this.date = newDate;
-      this.numOfSeat = newnumOfSeat;
+      this.numOfSeat = newNumOfSeat;
       this.timeSlot = newTimeSlot;
       this.status = BookingStatus.RESCHEDULE;
 
@@ -125,7 +134,7 @@ export class Booking {
     }
 
     if (isSameDateTime) {
-      this.restaurant.removeSeatsAvailability(newDate, newTimeSlot, this.numOfSeat);
+      this.restaurant.removeSeatsAvailability(this.date, this.timeSlot, this.numOfSeat);
     }
 
     console.log('Reschedule is failed.\nPlease re-try.');

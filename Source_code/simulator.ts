@@ -52,17 +52,18 @@ class Simulator {
         const customer = this.getCustomer(customerId)
 
         const booking = customer.getBooking(bookingId);
+        if(!booking)return;
 
         booking.cancel();
     }
 
-    simulateReschedule(customerId: string, bookingId: string, newDate: string, newnumOfSeat: number, newTimeSlot: string): void {
+    simulateReschedule(customerId: string, bookingId: string, newDate: string, newnumOfSeat: number, newTimeSlot: string, newPaymentMethod: Payment): void {
         const customer = this.getCustomer(customerId)
 
         const booking = customer.getBooking(bookingId);
-
-
-        booking.reschedule(newDate, newnumOfSeat, newTimeSlot);
+        if(!booking)return;
+        
+        booking.reschedule(newDate, newnumOfSeat, newTimeSlot, newPaymentMethod);
     }
 
     simulateViewCustomersBooking(customerId: string): void {
@@ -102,13 +103,15 @@ s1.addRestaurant("R2", "Food Station", "115, first floor, Reliance mall, Ahmedab
 s1.addCustomer('C1', "Nitvik", "9586764635", "nitvik@gmail.com");
 s1.addCustomer('C2', "Jayraj", "9738587203", "jayraj@gmail.com");
 
-s1.simulateBooking('C1', "R1", "2025-02-15", 10, "1 P.M.", new UPIPayment('9586764635@ptyes'));
-s1.simulateBooking('C1', "R2", "2025-02-16", 5, "2 P.M.", new CreditCardPayment('4568-7894-8945', '06/30', 897, 'Nitvik Gamit'));
-s1.simulateBooking('C2', "R1", "2025-02-15", 10, "3 P.M.", new UPIPayment('8469637980@apl'));
-s1.simulateBooking('C2', "R2", "2025-02-16", 15, "2 P.M.", new CreditCardPayment('8475-1254-4875', '08/32', 896, 'Jayraj Nakun'));
+s1.simulateBooking('C1', "R1", "2025-02-17", 10, "1 P.M.", new UPIPayment('9586764635@ptyes'));
+// s1.simulateBooking('C1', "R2", "2025-02-19", 5, "2 P.M.", new CreditCardPayment('4568-7894-8945', '06/30', 897, 'Nitvik Gamit'));
+// s1.simulateBooking('C2', "R1", "2025-02-19", 10, "3 P.M.", new UPIPayment('8469637980@apl'));
+// s1.simulateBooking('C2', "R2", "2025-02-18", 15, "2 P.M.", new CreditCardPayment('8475-1254-4875', '08/32', 896, 'Jayraj Nakun'));
+
+s1.simulateReschedule('C1', 'b1',"2025-02-18", 15, "3 P.M.",  new CreditCardPayment('4568-7894-8945', '06/30', 897, 'Nitvik Gamit'))
 
 s1.simulateViewCustomersBooking('C1')
-s1.simulateViewCustomersBooking('C2')
+// s1.simulateViewCustomersBooking('C2')
 
-s1.simulateViewRestaurantsBooking('R1')
-s1.simulateViewRestaurantsBooking('R2')
+// s1.simulateViewRestaurantsBooking('R1')
+// s1.simulateViewRestaurantsBooking('R2')
