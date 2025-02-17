@@ -11,19 +11,22 @@ type TimeSlotCapacity = {
 export class Restaurant {
 
   constructor(
-    public readonly id: string,
-    public readonly name: string,
-    public readonly address: string,
+    private id: string,
+    private name: string,
+    private address: string,
     private totalSeats: number = 0,
     private pricePerSeat: number,
     private cancelFeeRate: number = 0,
     private seatsAvaibility: SeatAvaibility = {},
     private timeSlot = new TimeSlot(),
+    private preBookingDays: number = preBookingDays
   ) {
+
+    const timeSlots = this.timeSlot.getTimeSlots();
     const start = new Date();
     const dates: string[] = [];
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < preBookingDays; i++) {
 
       const date: string = new Date(start.setDate(start.getDate() + 1))
         .toISOString()
@@ -33,13 +36,25 @@ export class Restaurant {
 
     for (let i = 0; i < dates.length; i++) {
       const timeSlotCapacity: TimeSlotCapacity = {};
-      for (let j = 0; j < this.timeSlot.getTimeSlots().length; j++) {
-        timeSlotCapacity[this.timeSlot.getTimeSlots()[j]] = this.totalSeats;
+      for (let j = 0; j < timeSlots.length; j++) {
+        timeSlotCapacity[timeSlots[j]] = this.totalSeats;
       }
       this.seatsAvaibility[dates[i]] = timeSlotCapacity;
     }
   }
-  
+
+  getId(): string {
+    return this.id;
+  }
+
+  getAddress(): string {
+    return this.address;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
   getSeatAvailability(): SeatAvaibility {
     console.log(this.seatsAvaibility);
     return this.seatsAvaibility;
@@ -60,7 +75,7 @@ export class Restaurant {
 
   calculateRefundAmount(numOfSeat: number): number {
     const cancellationCharge = this.calculateAmount(numOfSeat) * this.cancelFeeRate;
-    
+
     console.log(`Cancelation charges is ${cancellationCharge}.\n`);
 
     return this.calculateAmount(numOfSeat) - cancellationCharge;
@@ -72,10 +87,11 @@ export class Restaurant {
   }
 
   showAvailableTimeSlots(date: string, numOfSeat: number): TimeSlotCapacity {
+    const timeSlots = this.timeSlot.getTimeSlots()
     let availableTimeSlots: TimeSlotCapacity = {};
 
-    for (let i = 0; i < this.timeSlot.getTimeSlots().length; i++) {
-      const timeSlot = this.timeSlot.getTimeSlots()[i];
+    for (let i = 0; i < timeSlots.length; i++) {
+      const timeSlot = timeSlots[i];
 
       if (this.seatsAvaibility[date][timeSlot] >= numOfSeat) {
         availableTimeSlots[timeSlot] = this.seatsAvaibility[date][timeSlot];

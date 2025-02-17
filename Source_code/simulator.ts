@@ -23,7 +23,7 @@ class Simulator {
     }
 
     getCustomer(customerId: string): Customer {
-        const customer = this.customers.find(customer => customer.id == customerId);
+        const customer = this.customers.find(customer => customer.getId() == customerId);
         return customer as Customer;
     }
 
@@ -36,7 +36,7 @@ class Simulator {
 
     getRestaurant(restaurantId: string): Restaurant {
 
-        const restaurant = this.restaurants.find(restaurant => restaurant.id == restaurantId);
+        const restaurant = this.restaurants.find(restaurant => restaurant.getId() == restaurantId);
         return restaurant as Restaurant;
     }
 
@@ -73,16 +73,16 @@ class Simulator {
     simulateViewRestaurantsBooking(restaurantId: string): void {
         const bookings: string[] = []
         this.customers.forEach(customer => {
-            const matchedBookings = customer.getBookings().filter(booking => booking.restaurant.id == restaurantId);
+            const matchedBookings = customer.getBookings().filter(booking => booking.restaurant.getId() == restaurantId);
 
             matchedBookings.forEach(booking => {
                 bookings.push(`
-    Customer: ${customer.name}${booking.getDetails()}`)
+    Customer: ${customer.getName()}${booking.getDetails()}`)
             });
         });
 
         if (bookings.length > 0) {
-            console.log(`Bookings of ${this.getRestaurant(restaurantId).name}\n`)
+            console.log(`Bookings of ${this.getRestaurant(restaurantId).getName()}\n`)
             bookings.forEach(booking => {
                 const index = bookings.indexOf(booking);
                 console.log(`Booking ${index + 1}: ${booking}`)
@@ -90,7 +90,7 @@ class Simulator {
             return;
         }
 
-        console.log(`${this.getRestaurant(restaurantId).name} has no bookings.`);
+        console.log(`${this.getRestaurant(restaurantId).getName()} has no bookings.`);
     }
 
 }

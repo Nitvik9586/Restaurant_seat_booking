@@ -32,7 +32,7 @@ export class Booking {
   }
 
   public confirm(): void {
-    console.log(`Booking started by ${this.customer.name}...\n`);
+    console.log(`Booking started by ${this.customer.getName()}...\n`);
     console.log(`Selected date: ${this.date}\n`);
     console.log(`Selected timeslot: ${this.timeSlot}\n`);
     console.log(`Selected number of seats: ${this.numOfSeats}\n`);
@@ -51,7 +51,7 @@ export class Booking {
 
         this.status = BookingStatus.CONFIRMED;
 
-        console.log(`Your booking is confirmed with Booking ID ${this.id} in ${this.restaurant.name} restaurant.\n
+        console.log(`Your booking is confirmed with Booking ID ${this.id} in ${this.restaurant.getName()} restaurant.\n
 ================================================================\n`);
         return;
       }

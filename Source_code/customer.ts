@@ -2,12 +2,20 @@ import { Booking } from "./booking";
 
 export class Customer {
   constructor(
-    public readonly id: string,
-    public readonly name: string,
+    private id: string,
+    private name: string,
     private contactNum: string,
     private email: string,
     private bookingHistory: Booking[] = []
   ) { }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getName(): string {
+    return this.name;
+  }
 
   public addBooking(booking: Booking): void {
     this.bookingHistory.push(booking);
@@ -27,8 +35,8 @@ export class Customer {
     this.bookingHistory.forEach(booking => {
       const index = this.bookingHistory.indexOf(booking);
       bookings.push(`\nBooking ${index + 1}:
-    Restaurant: ${booking.restaurant.name}
-    Addres: ${booking.restaurant.address}${booking.getDetails()}`)
+    Restaurant: ${booking.restaurant.getName()}
+    Addres: ${booking.restaurant.getAddress()}${booking.getDetails()}`)
     });
 
     if (bookings.length > 0) {
